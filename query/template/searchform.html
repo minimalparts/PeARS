@@ -1,0 +1,17 @@
+$def with (form)
+<head><title>PeARS search</title></head>
+<!---<body style="background-color: #00A2E8"> -->
+<body style="background-color: white">
+
+<div style="width: 1000px; height: 200px; position: absolute; top: 0; bottom: 0; left: 0; right: 0; margin: auto;">
+<center>
+<!--- <img src="./static/pears-logo-small.png" style="display: block; margin-left: auto; margin-right: auto; height: 100px;"> -->
+<a href="http://localhost:8080/"><img src="./static/pears-logo-small.png"></a><br>
+<form name="main" method="post"> 
+$if not form.valid: <p class="error">Please enter a query</p>
+$:form.render()
+<br><input type="submit" />    </form>
+</center>
+</div>
+
+</body>
