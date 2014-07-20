@@ -1,0 +1,129 @@
+#!/bin/bash
+
+###########################################################################
+# ./getDomainPages
+# This script retrieves all pages for a particular domain from your history
+# and processes them ready for searching.
+# EXAMPLE USAGE: ./getDomainPages https://en.wikipedia.org wikipedia
+###########################################################################
+
+
+
+
+domain=$1	#beginning of domain name, *must* start as in history.pages e.g. http://stackoverflow.com
+dir=$2		#how that domain will be referred to in the directory structure e.g. stackoverflow
+
+rm -f $dir.log
+
+#Erase previous version of this directory
+if [ -d domains/$dir/ ]
+then
+
+	rm -fr domains/$dir/
+	rm -fr domains/$dir-lemmas/
+	rm -fr domains/$dir-pagereps/
+fi
+
+#If no domains directory exists, create one
+if [ ! -d domains/ ]
+then
+	mkdir domains/
+fi
+
+
+echo "Hi! Creating page representations, topics and index for domain $dir!"
+
+less history.pages |grep "^$domain" > domains/$dir.pages
+
+#Use this line if you have a file with a list of domain names. $domain is then the name of the file, $dir the name you chose for that group of files
+#while read l; do less history.pages |grep "^$l"; done < $domain > domains/$dir.pages
+
+echo "Found `cat domains/$dir.pages|wc -l` pages for that domain..."
+
+
+############################################################
+#Grab pages for that domain using the text-only browser lynx
+############################################################
+
+echo "Lynxing pages..."
+mkdir domains/$dir
+mkdir domains/$dir-lemmas/
+c=0	#initialise counter
+while read l; 
+do 
+	echo "Lynxing $l..." >> $dir.log
+	echo "### $l" > domains/$dir/$c.lynx;	#Record URL of the page
+	lynx -dump $l|sed "s/\[.\+\]//g"|egrep -v "[0-9]*\. http" >> domains/$dir/$c.lynx; 
+	c=`expr $c + 1`
+done < domains/$dir.pages
+
+
+########################################################
+#Tag pages for that domain using the stanford POS tagger
+########################################################
+
+echo "POS-tagging pages..."
+cd ~/stanford-postagger-2014-06-16
+for f in ~/PEARS/domains/$dir/*; 
+do
+flemmas=`echo $f|sed "s/$dir/$dir-lemmas/"`;
+echo "POS-tagging $flemmas..." >> $dir.log
+cat $f|sed '1d' > postag.tmp
+head -1 $f > $flemmas	#Record URL in lemmatised file
+java -mx300m -classpath stanford-postagger.jar edu.stanford.nlp.tagger.maxent.MaxentTagger -model models/english-left3words-distsim.tagger -textFile postag.tmp  -outputFormatOptions lemmatize -outputFormat inlineXML|egrep "pos.*lemma|<.sentence>"|sed "s/.*pos=.\([^\"]*\). lemma=.\([^\"]*\).*/\2_\1/"|tr '\n' ' '|sed "s/<.sentence>/\n/g"|sed "s/^ //" >> $flemmas
+done
+rm -f postag.tmp
+
+
+############################
+#Topic modelling with MALLET
+############################
+
+echo "Topic modelling..."
+cd ~/mallet-2.0.7/
+mkdir data/
+mkdir data/$dir
+for f in ~/PEARS/domains/$dir-lemmas/*;  
+do  
+f2=`echo $f|sed "s/.*\///"`;  
+head -1 $f > data/$dir/$f2; 
+cat $f|sed '1d'|sed "s/_\(.\)[^ ]*/-\1/g" >> data/$dir/$f2;  
+done
+
+bin/mallet import-dir --input data/$dir/ --output $dir.mallet --keep-sequence --remove-stopwords
+
+numpages=`ls -1 data/$dir|wc -l`
+numtopics=`echo "$numpages / 10"|bc`	#Number of topics, roughly a tenth of the number of pages for that domain
+
+bin/mallet train-topics --input $dir.mallet   --num-topics $numtopics --output-state topic-state.gz   --output-doc-topics $dir.doc.topics   --output-topic-keys $dir.topic.keys
+
+
+
+
+#########################
+#Produce topic-page index
+#########################
+
+echo "Building topic-page index..."
+cat $dir.doc.topics|sed '1d' > doc.topics.tmp
+while read l; 
+do 
+f=`echo $l|sed "s/[0-9]* file://"|sed "s/ .*//"`;	#Record file on system 
+fn=`echo $f|egrep -o "[0-9]*\.lynx"`;	#Record file name
+w=`head -1 $f|sed "s/### //"`;	#Record URL
+#Record 5 top topics for each document
+topics=`echo $l|sed "s/ \([0-9]\+ [0-9]*\.[0-9]*\)/\n\1/g"|egrep "^[0-9]* [0-9]\."|sed "s/ [0-9]\..*//"|head -5|tr '\n' ' '|sed "s/ $//"`; 
+echo "FILE: $fn URL: $w TOPICS: $topics"; 
+done < doc.topics.tmp > $dir.doc.topics.index
+rm -f doc.topics.tmp
+
+
+#########################
+#Run page representation
+#########################
+
+cd ~/PeARS/
+echo "Making page representations..."
+./mkPageRepresentations $dir
+
+echo "Finished! thank you!"
