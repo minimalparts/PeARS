@@ -64,7 +64,7 @@ done < domains/$dir.pages
 
 echo "POS-tagging pages..."
 cd ~/stanford-postagger-2014-06-16
-for f in ~/PEARS/domains/$dir/*; 
+for f in ~/PeARS/domains/$dir/*; 
 do
 flemmas=`echo $f|sed "s/$dir/$dir-lemmas/"`;
 echo "POS-tagging $flemmas..." >> $dir.log
@@ -83,7 +83,7 @@ echo "Topic modelling..."
 cd ~/mallet-2.0.7/
 mkdir data/
 mkdir data/$dir
-for f in ~/PEARS/domains/$dir-lemmas/*;  
+for f in ~/PeARS/domains/$dir-lemmas/*;  
 do  
 f2=`echo $f|sed "s/.*\///"`;  
 head -1 $f > data/$dir/$f2; 
