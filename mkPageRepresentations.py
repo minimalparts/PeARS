@@ -16,6 +16,7 @@ import re
 
 
 numDims = 300	#Number of dimensions in the space
+pears_home = "/home/aurelie/PeARS/"
 
 ###### Helpful functions #######################################################################
 
@@ -48,10 +49,10 @@ docdists=open("domains/"+domain+".doc.dists","w")
 	
 
 #Load the semantic space
-my_space = io_utils.load("/home/aurelie/PeARS/query/wikiwoods.ppmi.nmf_300.row.nocaps.pkl")
+my_space = io_utils.load(pears_home+"query/wikiwoods.ppmi.nmf_300.row.nocaps.pkl")
 
 #Load rows of space (words for which a distribution is available)
-rows = open( "/home/aurelie/PeARS/query/wikiwoods.rows", "r" )
+rows = open( pears_home+"query/wikiwoods.rows", "r" )
 dists = []
 for l in rows:
 	l=l.rstrip('\n')
