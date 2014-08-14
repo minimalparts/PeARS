@@ -7,10 +7,15 @@ from composes.utils import io_utils
 from composes.similarity.cos import CosSimilarity
 from operator import itemgetter, attrgetter
 import subprocess
+import urllib
 import sys
 import re
 import os
 import time
+
+
+
+pears_home="/home/aurelie/PeARS/"
 
 #Timing function, just to know how long things take
 def print_timing(func):
@@ -31,7 +36,7 @@ def print_timing(func):
 
 def runScript(query):
 	#load a semantic space
-	my_space = io_utils.load("bnc.ppmi.nmf_300.pkl")
+	my_space = io_utils.load("wikiwoods.ppmi.nmf_300.row.pkl")
 
 	#Remove any old pi-topics file in the directory
 	if os.path.exists("pi-topics.tmp"):
@@ -41,7 +46,7 @@ def runScript(query):
 	#weightWO=3		#Weight for word ovelap score
 
 	#Load rows of space (words for which a distribution is available)
-	rows = open( "bnc.rows", "r" )
+	rows = open( "wikiwoods.rows", "r" )
 	dists = []
 	for l in rows:
 		l=l.rstrip('\n')
@@ -162,15 +167,48 @@ def runScript(query):
 			break
 
 
-	#Output string of helpful pears
-	r=""
-	pcount=1				#Counter to prevent comma at the end of string
+
+
+	#####################
+	#Output helpful pears
+	#####################
+
+	r=[]
+	# Retrieve pear.profile data
 	for pear in pears:
-		if pcount != len(pears):
-			r=r+pear+","	
-			pcount+=1
+		profile = []
+		pi_name=""
+		pi_picture=""
+		pi_message=""
+		base_url=""
+		if "Pi" in pear:
+			base_url=pears_home+pear+"/"
+			profile_file=open(base_url+"pear.profile")
+			img_url="file://"+base_url
 		else:
-			r=r+pear
+			base_url="http://"+pear+"/"
+			profile_file=urllib.urlopen(base_url+"pear.profile")
+			img_url=base_url
+
+		for line in profile_file:
+			m = re.search('^name = \"([^\"]*)\"', line)
+			if m:
+				pi_name	= m.group(1)
+				profile.append(pi_name)
+			m = re.search('^img = \"([^\"]*)\"', line)
+			if m:
+				if "Pi" in pear:
+					profile.append("./static/pi-pic.png")		#web browser won't let us access local image from localhost, so using generic picture
+				else:
+					pi_picture = m.group(1)
+					profile.append(img_url+pi_picture)
+			m = re.search('^message = \"([^\"]*)\"', line)
+			if m:
+				pi_message = m.group(1)
+				profile.append(pi_message)
+
+		r.append(profile)
+
 	return r
 
 

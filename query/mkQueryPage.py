@@ -39,11 +39,11 @@ class index:
         form = myform()
         # make sure you create a copy of the form by calling it (line above)
         # Otherwise changes will appear globally
-        return render.formtest(form)
+        return render.searchform(form)
     def POST(self): 
         form = myform() 
         if not form.validates(): 
-            return render.formtest(form)
+            return render.searchform(form)
         else:
 	    query=form['search'].value
 	    pears=topicaliseQueryBrowser.runScript(query)

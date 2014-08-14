@@ -1,0 +1,37 @@
+$def with (pears,results,query)
+<head><title>PeARS search</title>
+<link rel="stylesheet" href="./static/main.css">
+</head>
+<!---<body style="background-color: #00A2E8"> -->
+<body>
+
+<div id='container'>
+
+	<div id='topline'>
+	</div>
+	<div id='results'>
+	<!--- <img src="./static/pears-logo-small.png" style="display: block; margin-left: auto; margin-right: auto; height: 100px;"> -->
+		<a href="http://localhost:8080/"><img src="./static/pears-logo-small.png"></a><br><br>
+		<b>Query: $query </b><br>
+		<b>You got the following recommendations... </b>
+		<br><br>
+
+		<table>
+		$for r in results:
+		<!--	<tr><td><a href="$r[0]">$r[0]</a></td></tr> -->
+			<tr><td><a href="$r[0]">$r[0]</a><br>$r[1]<br><br></td></tr>
+		</table>
+	</div>
+	<div id='recommenders'>
+		$for p in pears:
+			<div id="wrapper">
+			    <img src=$p[1] class="hover" width="50px"/>
+				    <p class="text">$p[2]</p>
+			</div><br>
+<!-- 			<td><div style="width:60px;height:60px;-webkit-border-radius: 10px;-moz-border-radius: 10px;border-radius: 10px;background-color:#A349A4; vertical-align: middle;">
+			  <a class="hovertext" href="#" title="$p[2]"><img src=$p[1] width="50px" style="margin: 5px;"></a>
+			</div> 
+			</td> -->
+	</div>
+</div>
+</body>

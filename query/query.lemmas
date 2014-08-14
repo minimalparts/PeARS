@@ -1,0 +1,10 @@
+<sentence id="382">
+  <word wid="0" pos="VB" lemma="get">GET</word>
+  <word wid="1" pos=":" lemma="/">/</word>
+  <word wid="2" pos="." lemma="?">?</word>
+</sentence>
+<sentence id="383">
+  <word wid="0" pos="NNS" lemma="spear">spears</word>
+  <word wid="1" pos="NN" lemma="http/1">HTTP/1</word>
+  <word wid="2" pos="CD" lemma=".1">.1</word>
+</sentence>

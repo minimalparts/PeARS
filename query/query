@@ -1,0 +1,2 @@
+python topicalise-query.py bnc.ppmi.nmf_300.pkl
+python compare-query-sentence.py

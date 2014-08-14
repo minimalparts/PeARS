@@ -9,6 +9,7 @@ from composes.utils import io_utils
 from composes.similarity.cos import CosSimilarity
 from operator import itemgetter, attrgetter
 import webbrowser
+import urllib
 import sys
 import re
 import time
@@ -57,6 +58,7 @@ def runScript():
 		pi=words[0]
 		topic=""
 		domain=""
+		piaddress=""
 		
 		m = re.search('-([0-9]+)', words[1])
 		if m:
@@ -65,10 +67,17 @@ def runScript():
 		if m:
 			domain=m.group(1)
 
-		piaddress=pears_home+pi+"/"+domain+"/"
+		#Are we using a local folder named 'Pi...' as the searchable directory, or an actual web server?
+		if "Pi" in pi:
+			piaddress=pears_home+pi
+			index=open(piaddress+"/"+domain+"/"+domain+".doc.topics.index")
+		else:
+			piaddress="http://"+pi
+			index=urllib.urlopen(piaddress+"/"+domain+"/"+domain+".doc.topics.index")
+
 		topic_search="TOPICS:.* "+topic+" |TOPICS:.* "+topic+"$"
 		
-		for fline in open(piaddress+domain+".doc.topics.index"):
+		for fline in index:
 			m1 = re.search(topic_search, fline)
 		 	if m1:
 		   		m2 = re.search('FILE: (.*\.lynx) URL', fline)
@@ -94,7 +103,13 @@ def runScript():
 		bestSentenceScore=0.0
 		numSentences=0
 		
-		for dline in open(pears_home+doc[0]+"/"+doc[1]+"/pages/"+doc[2]):
+		#Are we using a local folder named 'Pi...' as the searchable directory, or an actual web server?
+		if "Pi" in doc[0]:
+			peardoc=open(pears_home+doc[0]+"/"+doc[1]+"/pages/"+doc[2])
+		else:
+			peardoc=urllib.urlopen("http://"+doc[0]+"/"+doc[1]+"/pages/"+doc[2])
+		
+		for dline in peardoc:
 			m3 = re.search('<BOW>',dline)
 			if m3:
 				scoreWO=0.0
@@ -113,6 +128,8 @@ def runScript():
 					bestSentence=dline		#Record most relevant sentence for that document, for display in the results
 					bestSentenceScore=scoreWO
 				pagescore+=scoreWO
+				if numSentences > 30:			#For speed (and accuracy!), only process first 30 sentences of the file
+					break
 		if numSentences > 0:
 			pagescore = pagescore / numSentences		#Document score is the sum of all sentence scores over the number of sentences
 		if pagescore > 0:
@@ -120,6 +137,8 @@ def runScript():
 			scores.append(doc_score)
 
 	results=[]	#Initialise results
+
+
 
 
 	############################
@@ -143,8 +162,12 @@ def runScript():
 	else:
 		duckquery=""
 		for w in querywords:
-			duckquery+=w+"+"
+			m = re.search('(.*)_.',w)
+			if m:
+				duckquery+=m.group(1)+"+"
 		webbrowser.open_new_tab("https://duckduckgo.com/?q="+duckquery)
+		link_sent=["#######","No suitable recommendation. You were redirected to duckduckgo."]
+		results.append(link_sent)
 
 	return results
 
