@@ -124,6 +124,6 @@ rm -f doc.topics.tmp
 
 cd ~/PeARS/
 echo "Making page representations..."
-./mkPageRepresentations $dir
+python ./mkPageRepresentations.py $dir
 
 echo "Finished! thank you!"

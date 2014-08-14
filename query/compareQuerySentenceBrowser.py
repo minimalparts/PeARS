@@ -6,6 +6,8 @@
 ####################################################################### 
 
 from composes.utils import io_utils
+from composes.semantic_space.space import Space
+from composes.composition.weighted_additive import WeightedAdditive
 from composes.similarity.cos import CosSimilarity
 from operator import itemgetter, attrgetter
 import webbrowser
@@ -13,9 +15,14 @@ import urllib
 import sys
 import re
 import time
+import os
 
 #Change this line to your PeARS folder path
 pears_home="/home/aurelie/PeARS/"
+
+numDims = 300   #Number of dimensions in the space
+
+##### Helpful functions ########################################################################
 
 #Timing function, just to know how long things take
 def print_timing(func):
@@ -27,16 +34,34 @@ def print_timing(func):
 		return res
 	return wrapper
 
-# The @ decorator before the function invokes print_timing()
-@print_timing
+
+
+def mkNullVector(fileName, vectorName, numDims):
+        null_vector=vectorName+" "
+        for i in range(numDims):
+                null_vector+="0.0 "
+        filetmp = open(fileName, "w" )
+        filetmp.write(null_vector.strip())
+        filetmp.close()
+
+##### Helpful functions end ####################################################################
+
+
+
+
+
 
 ##############################################
 #Main function, called by mkQueryPage.py
 ##############################################
 
+# The @ decorator before the function invokes print_timing()
+@print_timing
 def runScript():
 	PTfile = open( "pi-topics.tmp", "r" )	#Open pi-topic file
 	Qfile = open("query.tmp", "r") 		#Open query file
+
+	my_space = io_utils.load(pears_home+"query/wikiwoods.ppmi.nmf_300.row.nocaps.pkl")	#Load semantic space
 
 	#Get user search from file
 	query=Qfile.readline().rstrip('\n')
@@ -45,7 +70,27 @@ def runScript():
 
 	scores = []	#Initialise score
 	docs = [] 	#Initialise docs
+	
+	mkNullVector("query.dm","_query_",numDims)	#Initialise query vector
+	
+	#Load rows of space (words for which a distribution is available)
+	rows = open( "wikiwoods.rows", "r" )
+	dists = []
+	for l in rows:
+		l=l.rstrip('\n')
+		dists.append(l)
+	rows.close()
 
+	#Add distributions of query words into _query_ vector, living in query_space 
+	query_space=Space.build(data="query.dm", format="dm")
+	my_comp=WeightedAdditive(alpha = 1, beta = 1);
+
+	for a in range(len(querywords)):
+		if a in dists:
+			query_space = my_comp.compose([(querywords[a], "_query_", "_query_")],(my_space,query_space))
+
+	#print composed_space.id2row
+	query_space.export("./query", format="dm")
 
 	###############################################################
 	# For each topic in PTfile, find on the relevant file all pages
@@ -71,25 +116,43 @@ def runScript():
 		if "Pi" in pi:
 			piaddress=pears_home+pi
 			index=open(piaddress+"/"+domain+"/"+domain+".doc.topics.index")
+			distFile=piaddress+"/"+domain+"/"+domain+".doc.dists"
 		else:
 			piaddress="http://"+pi
 			index=urllib.urlopen(piaddress+"/"+domain+"/"+domain+".doc.topics.index")
+			distFile=piaddress+"/"+domain+"/"+domain+".doc.dists"
+
+		#Read the document_space from distFile
+		if os.path.exists(distFile): 	#If distFile has been computed for this topic
+			composed_document_space=Space.build(data=distFile, format="dm")
 
 		topic_search="TOPICS:.* "+topic+" |TOPICS:.* "+topic+"$"
-		
+
 		for fline in index:
 			m1 = re.search(topic_search, fline)
-		 	if m1:
-		   		m2 = re.search('FILE: (.*\.lynx) URL', fline)
+			if m1:
+				m2 = re.search('FILE: (.*\.lynx) URL', fline)
 				if m2:
 					doc=m2.group(1)
-					m3 = re.search('.*URL: (.*) TOPICS.*', fline)
-					if m3:
-						url=m3.group(1)
-						loc=[pi,domain,doc,url]
-						if loc 	not in docs:
-							docs.append(loc)
+					if os.path.exists(distFile): 	#If distFile has been computed for this topic
+						docScore=composed_document_space.get_sim(doc, "_query_", CosSimilarity(), space2=query_space)
+						if docScore > 0.5:	#Only consider documents over a certain threshold
+							m3 = re.search('.*URL: (.*) TOPICS.*', fline)
+							if m3:
+								url=m3.group(1)
+								loc=[pi,domain,doc,url]
+								if loc 	not in docs:
+									docs.append(loc)
+					else:
+						m3 = re.search('.*URL: (.*) TOPICS.*', fline)
+						if m3:
+							url=m3.group(1)
+							loc=[pi,domain,doc,url]
+							if loc 	not in docs:
+								docs.append(loc)
+						
 
+		index.close()
 
 
 	########################################################
@@ -120,7 +183,7 @@ def runScript():
   
 				for qw in querywords:
 					for w in dlinewords:
-						if w == qw:
+						if w.lower() == qw.lower():
 							scoreWO+=1
 							break
 				scoreWO = scoreWO / querylength		#Sentence score is proportional to how many words from the query are contained in the sentence
