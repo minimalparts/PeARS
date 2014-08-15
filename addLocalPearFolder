@@ -1,0 +1,27 @@
+#!/bin/bash
+#######################################################
+# Make pear folder for a new topic
+# USAGE: ./mkLocalPearFolder [pear name] [topic]
+# EXAMPLE: ./mkLocalPearFolder Pi1 wikipedia
+#######################################################
+
+if [ ! -d $1 ]
+	then
+	mkdir $1
+fi
+
+if [ ! -d $1/$2 ]
+	then
+	mkdir $1/$2
+fi
+
+if [ ! -d $1/$2/pages/ ]
+	then
+	mkdir $1/$2/pages/
+	fi
+
+cp domains/$2-pagereps/* $1/$2/pages/
+cp domains/$2.doc.dists $1/$2/
+cp ~/mallet-2.0.7/$2.doc.topics.index $1/$2/
+java -mx300m -classpath ~/stanford-postagger-2014-06-16/stanford-postagger.jar edu.stanford.nlp.tagger.maxent.MaxentTagger -model ~/stanford-postagger-2014-06-16/models/english-left3words-distsim.tagger -textFile ~/mallet-2.0.7/$2.topic.keys|sed "s/\([0-9]*\)_CD\( [0-9]*\.*[0-9]*\)_CD/\n\1\2/g"|sed "s/\(_[A-Z]\)[A-Z]*/\1/g"|sed '1d'|sed "s/^/$1: $2-/" > $1/$2/$2.topic.keys 
+
