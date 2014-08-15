@@ -86,7 +86,7 @@ def runScript():
 	my_comp=WeightedAdditive(alpha = 1, beta = 1);
 
 	for a in range(len(querywords)):
-		if a in dists:
+		if querywords[a] in dists:
 			query_space = my_comp.compose([(querywords[a], "_query_", "_query_")],(my_space,query_space))
 
 	#print composed_space.id2row
@@ -136,7 +136,8 @@ def runScript():
 					doc=m2.group(1)
 					if os.path.exists(distFile): 	#If distFile has been computed for this topic
 						docScore=composed_document_space.get_sim(doc, "_query_", CosSimilarity(), space2=query_space)
-						if docScore > 0.5:	#Only consider documents over a certain threshold
+						#print doc,docScore
+						if docScore > 0.3:	#Only consider documents over a certain threshold
 							m3 = re.search('.*URL: (.*) TOPICS.*', fline)
 							if m3:
 								url=m3.group(1)
