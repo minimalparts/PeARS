@@ -19,17 +19,17 @@ dir = sys.argv[2] #how that domain will be referred to in the directory structur
 #Retrieve relevant history pages
 #################################
 
-#if os.path.exists(home+dir+".log"):
-#	os.remove(home+dir+".log")
+if os.path.exists(home+dir+".log"):
+	os.remove(home+dir+".log")
 
 #Erase previous versions of this directory
 
-#if os.path.isdir(home+"domains/"+dir):
-#	shutil.rmtree(home+"domains/"+dir)
-#if os.path.isdir(home+"domains/"+dir+"-lemmas/"):
-#	shutil.rmtree(home+"domains/"+dir+"-lemmas/")
-#if os.path.isdir(home+"domains/"+dir+"-pagereps/"):
-#	shutil.rmtree(home+"domains/"+dir+"-pagereps/")
+if os.path.isdir(home+"domains/"+dir):
+	shutil.rmtree(home+"domains/"+dir)
+if os.path.isdir(home+"domains/"+dir+"-lemmas/"):
+	shutil.rmtree(home+"domains/"+dir+"-lemmas/")
+if os.path.isdir(home+"domains/"+dir+"-pagereps/"):
+	shutil.rmtree(home+"domains/"+dir+"-pagereps/")
 
 #If no domains directory exists, create one
 
@@ -71,8 +71,8 @@ log = open (home+dir+".log",'w')
 
 print "Lynxing pages..."
 
-#os.makedirs(home+"domains/"+dir)
-#os.makedirs(home+"domains/"+dir+"-lemmas")
+os.makedirs(home+"domains/"+dir)
+os.makedirs(home+"domains/"+dir+"-lemmas")
 
 c = 0	#Initialise counter
 
@@ -81,23 +81,22 @@ domainpages = open(home+"domains/"+dir+".pages",'r')
 for line in domainpages:
 	log.write("Lynxing "+line.rstrip('\n')+"...\n")
 	
-	#command = "lynx -dump "+line
-	#print "Executing",command
-	#t = open("lynx.tmp",'w')
-	#subprocess.call(["lynx","-dump", line], stdout=t)
-	#t.close()
-	
-	#lynxfile = open (home+"domains/"+dir+"/"+str(c)+".lynx",'w')
-	#lynxfile.write("### "+line)	#Record URL of the page
+	command = "lynx -dump "+line
+	print "Executing",command
+	t = open("lynx.tmp",'w')
+	subprocess.call(["lynx","-dump", line], stdout=t)
+	t.close()
+	lynxfile = open (home+"domains/"+dir+"/"+str(c)+".lynx",'w')
+	lynxfile.write("### "+line)	#Record URL of the page
 
-	#lynxtmp = open (home+"lynx.tmp",'r')
-	#for lynxline in lynxtmp:
-#		regex="[0-9]*\. http"
-#		if not re.search(regex,lynxline):	#Don't include lynx 'footnotes' with links
-#			cleanline=re.sub(r"\[.+\]", "", lynxline)			
-#			lynxfile.write(cleanline)
-#	lynxfile.close()
-#	os.remove(home+"lynx.tmp")
+	lynxtmp = open (home+"lynx.tmp",'r')
+	for lynxline in lynxtmp:
+		regex="[0-9]*\. http"
+		if not re.search(regex,lynxline):	#Don't include lynx 'footnotes' with links
+			cleanline=re.sub(r"\[.+\]", "", lynxline)			
+			lynxfile.write(cleanline)
+	lynxfile.close()
+	os.remove(home+"lynx.tmp")
 	c+=1
 
 domainpages.close()
@@ -107,52 +106,52 @@ domainpages.close()
 #########################################################
 
 print "POS-tagging pages..."
-#for f in listdir(home+"domains/"+dir+"/"):
-#	flemmas=open(home+"domains/"+dir+"-lemmas/"+f,'w')
-#
-#	log.write("POS-tagging "+f+"...")
-#	
-#	postagtmp=open("postag.tmp",'w')
-#	
-#	#Delete first line of file + record url
-#	c = 0
-#	url = ""
-#	flines=open(home+"domains/"+dir+"/"+f,'r')
-#	for line in flines:
-#		if c > 0:
-#			postagtmp.write(line)
-#		else:
-#			url=line
-#			flemmas.write(url)
-#		c+=1	
-#
-#	postagtmp.close()
-#
-#	fileIn=home+"postag.tmp"
-#	fileOut=home+"tagger.out"
-#	command="./runTagger.sh "+fileIn+" "+fileOut
-#	#print command
-#	subprocess.call(command, shell=True)
-#
-#
-#	taggedfile=open("tagger.out",'r')
-#	for line in taggedfile:
-#		regex="pos.*lemma"
-#		if re.search(regex,line):
-#			m=re.search('pos=.([^\"]*). lemma=.([^\"]*)',line)	#Process lines to get words_POS output format
-#			if m:
-#				pos=m.group(1)
-#				lemma=m.group(2)
-#				flemmas.write(lemma+"_"+pos+" ")
-#		regex="<.sentence"
-#		if re.search(regex,line):
-#			flemmas.write('\n')	#One sentence per line
-#				
-#	taggedfile.close()
-#
-#	flemmas.close()
+for f in listdir(home+"domains/"+dir+"/"):
+	flemmas=open(home+"domains/"+dir+"-lemmas/"+f,'w')
 
-#os.remove(home+"postag.tmp")
+	log.write("POS-tagging "+f+"...")
+	
+	postagtmp=open("postag.tmp",'w')
+	
+	#Delete first line of file + record url
+	c = 0
+	url = ""
+	flines=open(home+"domains/"+dir+"/"+f,'r')
+	for line in flines:
+		if c > 0:
+			postagtmp.write(line)
+		else:
+			url=line
+			flemmas.write(url)
+		c+=1	
+
+	postagtmp.close()
+
+	fileIn=home+"postag.tmp"
+	fileOut=home+"tagger.out"
+	command="./runTagger.sh "+fileIn+" "+fileOut
+	#print command
+	subprocess.call(command, shell=True)
+
+
+	taggedfile=open("tagger.out",'r')
+	for line in taggedfile:
+		regex="pos.*lemma"
+		if re.search(regex,line):
+			m=re.search('pos=.([^\"]*). lemma=.([^\"]*)',line)	#Process lines to get words_POS output format
+			if m:
+				pos=m.group(1)
+				lemma=m.group(2)
+				flemmas.write(lemma+"_"+pos+" ")
+		regex="<.sentence"
+		if re.search(regex,line):
+			flemmas.write('\n')	#One sentence per line
+				
+	taggedfile.close()
+
+	flemmas.close()
+
+os.remove(home+"postag.tmp")
 
 
 ############################
@@ -170,30 +169,30 @@ if not os.path.isdir(mallet_path+"data/"+dir):
 
 numpages = 0
 
-#for f in listdir(home+"domains/"+dir+"-lemmas/"):
-#	flemmas= open(home+"domains/"+dir+"-lemmas/"+f)
-#	mallet_file=open(mallet_path+"data/"+dir+"/"+f,'w')
-#
-#	c = 0
-#	for line in flemmas:
-#		if c == 0:
-#			mallet_file.write(line)
-#		else:
-#			line=re.sub(r"_(.)[^ ]*", r"-\1", line)	#Only retain first letter of POS tag
-#			mallet_file.write(line)
-#		c+=1
-#			
-#
-#	mallet_file.close()
-#	flemmas.close()
-#	
-#	numpages+=1
+for f in listdir(home+"domains/"+dir+"-lemmas/"):
+	flemmas= open(home+"domains/"+dir+"-lemmas/"+f)
+	mallet_file=open(mallet_path+"data/"+dir+"/"+f,'w')
 
-#numtopics = int(numpages / 10) + 1	#Number of topics, roughly a tenth of the number of pages for that domain. +1 in case numpages < 10
+	c = 0
+	for line in flemmas:
+		if c == 0:
+			mallet_file.write(line)
+		else:
+			line=re.sub(r"_(.)[^ ]*", r"-\1", line)	#Only retain first letter of POS tag
+			mallet_file.write(line)
+		c+=1
+			
+
+	mallet_file.close()
+	flemmas.close()
 	
-#command="./runTopicaliser.sh "+dir+" "+str(numtopics)
-##print command
-#subprocess.call(command, shell=True)
+	numpages+=1
+
+numtopics = int(numpages / 10) + 1	#Number of topics, roughly a tenth of the number of pages for that domain. +1 in case numpages < 10
+	
+command="./runTopicaliser.sh "+dir+" "+str(numtopics)
+#print command
+subprocess.call(command, shell=True)
 
 
 ##########################
