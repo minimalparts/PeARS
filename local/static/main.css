@@ -1,0 +1,81 @@
+<style type="text/css"> 
+
+#container{
+width: 1000px; 
+height: 500px;
+top: 50px;
+margin: 0px auto;
+text-align: left;
+}
+
+#topline {
+display: block;
+position: absolute;
+width: 700px;
+height: 10px;
+top: 50px;
+background-image: url('topline.png');
+background-repeat: repeat-x;
+z-index: -100;
+}
+
+#results {
+width: 600px; 
+float: left;
+padding-left: 50px;
+}
+
+#recommenders {
+width: 300px;
+height: 293px;
+background-image: url('recommenders-background.png');
+background-repeat: no-repeat;
+padding-left: 20px;
+padding-top: 20px;
+margin-left: 50px;
+float:left;
+}
+
+
+#wrapper .text {
+position:absolute;
+left: 600px;
+top: 100px;
+visibility:hidden;
+}
+
+#wrapper:hover .text {
+visibility:visible;
+padding: 20px; 
+width: 200px; 
+background: rgba(0,0,0,0.8); 
+color: #fff; 
+}
+
+
+a.hovertext { 
+text-decoration: none !important; 
+text-align: center; 
+} 
+
+a.hovertext:after { 
+content: attr(title);
+position: absolute; 
+left: 600px;
+top: 100px;
+padding: 20px; 
+width: 200px; 
+background: rgba(0,0,0,0.8); 
+text-decoration: none !important; 
+color: #fff; 
+opacity: 0; 
+-webkit-transition: 0.5s; 
+-moz-transition: 0.5s; 
+-o-transition: 0.5s; 
+-ms-transition: 0.5s; 
+}
+
+a.hovertext:hover:after, a.hovertext:focus:after { 
+opacity: 1.0; 
+} 
+</style>
