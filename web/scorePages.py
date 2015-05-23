@@ -181,7 +181,7 @@ def bestURLs(doc_scores):
 ################################################
 
 
-def output(pear,best_urls,query):
+def output(best_urls,query):
 	results=[]
 #	print query	
 	#If documents matching the query were found on the pear network...
@@ -220,7 +220,7 @@ def runScript(pears,query):
 		loadURLs(pear)
 		scoreDocs(query_dist,pear)
 	best_urls=bestURLs(doc_scores)
-	return output(pear,best_urls,query)	
+	return output(best_urls,query)	
 
 if __name__ == '__main__':
     runScript(sys.argv[1], sys.argv[2])
