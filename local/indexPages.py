@@ -15,7 +15,7 @@ import runDistSem
 import mkWordClouds
 from os import listdir
 
-path_to_PeARS="/home/aurelie/PeARS/"
+path_to_PeARS="/home/aurelie/PeARS/local/"
 url_dict={}		#Initialise a URL dictionary
 reverse_url_dict={}	#Reverse URL dictionary, just for the purpose of indexing
 new_files_ids=[]	#A holder for the new pages being processed, expressed as an ID number on the pear

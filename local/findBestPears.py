@@ -16,7 +16,7 @@ import time
 
 
 
-path_to_PeARS="/home/aurelie/PeARS/"
+path_to_PeARS="/home/aurelie/PeARS/local/"
 shared_pears_ids=path_to_PeARS+"shared_pears_ids.txt"
 dm_dict={}		#Dictionary to store dm file
 

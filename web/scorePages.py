@@ -19,7 +19,7 @@ import time
 import os
 
 #Change this line to your PeARS folder path
-path_to_PeARS="/home/aurelie/PeARS/"
+path_to_PeARS="/home/aurelie/PeARS/web/"
 dm_dict={}		#Dictionary to store dm file
 url_dict={}		#Dictionary file ids - urls
 reverse_url_dict={}	#Dictionary urls - file ids

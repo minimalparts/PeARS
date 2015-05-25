@@ -9,7 +9,7 @@ import re
 import math
 import operator
 
-path_to_PeARS = "/home/aurelie/PeARS/"
+path_to_PeARS = "/home/aurelie/PeARS/local/"
 index={}		#This is the positional index, of the form word:WordEntry
 document_names=[]	#This is a temporary vector holding single document names
 tfidfs={}

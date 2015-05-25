@@ -7,7 +7,7 @@ import sys
 import os
 import re
 
-path_to_PeARS = "/home/aurelie/PeARS/"
+path_to_PeARS = "/home/aurelie/PeARS/local/"
 index={}		#This is the positional index, of the form word:WordEntry
 individual_index={}	#This is the positional index for the individual file
 word_positions={}	#This is a temporary dictionary with positions for each word in the document being processed

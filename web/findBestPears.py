@@ -14,8 +14,8 @@ import time
 
 
 
-path_to_PeARS="/home/aurelie/PeARS/"
-shared_pears_ids=path_to_PeARS+"simulated-pear/web/shared_pears_ids.txt"
+path_to_PeARS="/home/aurelie/PeARS/web/"
+shared_pears_ids=path_to_PeARS+"shared_pears_ids.txt"
 dm_dict={}		#Dictionary to store dm file
 
 
