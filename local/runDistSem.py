@@ -1,8 +1,8 @@
 ####################################################################
-#./mkPageRepresentations v0.1 is a script which takes lemmatised web
+#./runDistSem.py is a script which takes lemmatised web
 # pages and  outputs one distribution per sentence -- the addition 
 # of all word vectors in that sentence.
-# ./mkPageRepresentations is called by ./getDomainPages
+# ./runDistSem.py is called by indexPages.py
 ####################################################################
 
 from numpy import *
@@ -150,8 +150,9 @@ def runScript(file_name,pear_name):
 	pear=pear_name		#Record pear name
 	readDM()		#Load the semantic space
 	docdist=processFile(file_name,pear)
-	updateDocDistFile(pear,file_name,docdist)
-	updatePearDist(pear,docdist)
+	if docdist!="":                                         #If document not empty
+		updateDocDistFile(pear,file_name,docdist)
+		updatePearDist(pear,docdist)
 
 # when executing as script
 if __name__ == '__main__':
