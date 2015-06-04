@@ -38,7 +38,10 @@ def readDM():
 
 def processFile(lemma_file,pear):
 	doc_dist=[]						#Holder for document distribution
-
+	for x in range(300):					#Initialise doc_dist
+		doc_dist.append(0)
+	doc_dist=array(doc_dist)
+	
 	lines = []
         f=open(path_to_PeARS+pear+"/lemmas/"+lemma_file,"r")
         lines=f.readlines()
@@ -76,6 +79,13 @@ def processFile(lemma_file,pear):
 			if w in dm_dict:
 #				print "Adding",w,"to vecs_to_add"
 				vecs_to_add.append(w)	
+				
+		#Initialise vbase
+		vbase=[]
+		for x in range(300):
+			vbase.append(0)
+		vbase=array(vbase)
+		
 
 		#Add vectors together
 		if len(vecs_to_add) > 0:
