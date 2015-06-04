@@ -5,10 +5,6 @@
 # ./mkPageRepresentations is called by ./getDomainPages
 ####################################################################
 
-from composes.semantic_space.space import Space
-from composes.utils import io_utils
-from composes.composition.weighted_additive import WeightedAdditive
-from composes.similarity.cos import CosSimilarity
 from numpy import *
 import sys
 import os
