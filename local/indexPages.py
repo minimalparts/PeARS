@@ -178,8 +178,8 @@ def runScript(a1,a2):
 		os.makedirs(path_to_PeARS+pear+"/distsem")
 	if not os.path.isdir(path_to_PeARS+pear+"/indexes"):
 		os.makedirs(path_to_PeARS+pear+"/indexes")
-	if not os.path.exists(path_to_PeARS+pear+"/doc.dists"):
-		open(path_to_PeARS+pear+"/doc.dists",'w').close()		#Touch file if it doesn't exist
+	if not os.path.exists(path_to_PeARS+pear+"/doc.dists.txt"):
+		open(path_to_PeARS+pear+"/doc.dists.txt",'w').close()		#Touch file if it doesn't exist
 	if not os.path.exists(path_to_PeARS+pear+"/profile.txt"):
 		profile=open(path_to_PeARS+pear+"/profile.txt",'w')
 		init_pear_id=""
