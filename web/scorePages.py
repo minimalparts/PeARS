@@ -1,7 +1,5 @@
 #######################################################################
-# ./compareQuerySentenceBrowser.py compares the query to each document
-# in the relevant topic, on the relevant pi, and returns scores for 
-# each document.
+# ./scorePages.py compares the query to each document
 # Called by ./mkQueryPage.py
 ####################################################################### 
 
@@ -47,7 +45,6 @@ def print_timing(func):
 
 #############################################
 # Cosine function
-# Copied from http://stackoverflow.com/questions/1823293/optimized-method-for-calculating-cosine-distance-in-python
 #############################################
 
 def cosine_distance(a, b):
@@ -79,19 +76,18 @@ def readDM():
 ##############################################
 
 def loadURLs(pear):
-#	print "Loading URL dictionary for",pear
-	path_to_dict=pear+"/urls.dict.txt"
+	print "Loading URL dictionary for",pear
+	path_to_dict=pear+"urls.dict.txt"
 
-	if os.path.exists(path_to_dict):
-		d=urllib.urlopen(path_to_dict)
-		for line in d:
-			line=line.rstrip('\n')
-			idfile=line.split()[0]
-			url=line.split()[1]
-#			print idfile,url
-			url_dict[idfile]=url		#Record the pairs url - file name on pear
-			reverse_url_dict[url]=idfile
-		d.close()
+	d=urllib.urlopen(path_to_dict)
+	for line in d:
+		line=line.rstrip('\n')
+		idfile=line.split()[0]
+		url=line.split()[1]
+		#print idfile,url
+		url_dict[idfile]=url		#Record the pairs url - file name on pear
+		reverse_url_dict[url]=idfile
+	d.close()
 
 ##############################################
 # Make distribution for query
@@ -122,28 +118,29 @@ def mkQueryDist(query):
 	return vbase
 
 ##############################################
-# Get word cloud for a file
+# Get word clouds for a pear
 ##############################################
 
-def getWordCloud(pear,file_name):
-	word_cloud=""
+def loadWordClouds(pear):
+	print "Loading word clouds..."
 	word_clouds=urllib.urlopen(pear+"/wordclouds.txt")
 	for l in word_clouds:
 		l=l.rstrip('\n')
 		fields=l.split(':')
-		if fields[0]==file_name:
-			word_cloud=fields[1]
-			break
-	return word_cloud	
+		url_wordclouds[fields[0]]=fields[1]
+	word_clouds.close()
+		
 	
 ################################################
 # Score documents for a pear
 ################################################
 
+@print_timing
 def scoreDocs(query_dist,pear):
 	dd=urllib.urlopen(pear+"/doc.dists.txt")
 	doc_dists=dd.readlines()
 	dd.close()
+	#print "Done reading dd"
 
 	for l in doc_dists:
 		scoreSIM = 0.0		#Initialise score for similarity
@@ -154,8 +151,7 @@ def scoreDocs(query_dist,pear):
 #		print doc_id,cosine_distance(doc_dist,query_dist)
 		score=cosine_distance(doc_dist,query_dist)
 		doc_scores[url_dict[doc_id]]=score
-		url_wordclouds[url_dict[doc_id]]=getWordCloud(pear,doc_id)
-	
+#		url_wordclouds[url_dict[doc_id]]=getWordCloud(pear,doc_id)
 	return doc_scores
 
 #################################################
@@ -187,7 +183,7 @@ def output(best_urls,query):
 	#If documents matching the query were found on the pear network...
 	if len(best_urls) > 0:
 		for u in best_urls:
-			results.append([u,url_wordclouds[u]])			
+			results.append([u,url_wordclouds[reverse_url_dict[u]]])			
 #			print "Getting snippet for",u
 #			snippet=returnSnippet.runScript(query,pear,reverse_url_dict[u])
 #			results.append([u,snippet])
@@ -217,7 +213,9 @@ def runScript(pears,query):
 	readDM()
 	query_dist=mkQueryDist(query)
 	for pear in pears:
+		#print pear
 		loadURLs(pear)
+		loadWordClouds(pear)
 		scoreDocs(query_dist,pear)
 	best_urls=bestURLs(doc_scores)
 	return output(best_urls,query)	
