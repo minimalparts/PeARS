@@ -116,11 +116,8 @@ def outputBestPears(pears_scores):
 		base_url=pear
 		profile_file=urllib.urlopen(base_url+"profile.txt")
 
+		profile.append(pear)
 		for line in profile_file:
-			m = re.search('^name = (.*)', line)
-			if m:
-				pi_name	= m.group(1)
-				profile.append(pi_name)
 			m = re.search('^message = (.*)', line)
 			if m:
 				pi_message = m.group(1)
