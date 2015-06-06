@@ -127,7 +127,8 @@ def loadWordClouds(pear):
 	for l in word_clouds:
 		l=l.rstrip('\n')
 		fields=l.split(':')
-		url_wordclouds[fields[0]]=fields[1]
+		url_wordclouds[url_dict[fields[0]]]=fields[1]
+
 	word_clouds.close()
 		
 	
@@ -183,7 +184,7 @@ def output(best_urls,query):
 	#If documents matching the query were found on the pear network...
 	if len(best_urls) > 0:
 		for u in best_urls:
-			results.append([u,url_wordclouds[reverse_url_dict[u]]])			
+			results.append([u,url_wordclouds[u]])			
 #			print "Getting snippet for",u
 #			snippet=returnSnippet.runScript(query,pear,reverse_url_dict[u])
 #			results.append([u,snippet])
