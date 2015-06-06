@@ -98,9 +98,15 @@ def mkQueryDist(query):
 
 def outputBestPears(pears_scores):
 	pears=[]
-	for w in sorted(pears_scores, key=pears_scores.get, reverse=True):
-#		print w, pears_scores[w]
-		pears.append(w)
+        num_best=3                              #Top best pears to search
+        count=0
+        for w in sorted(pears_scores, key=pears_scores.get, reverse=True):
+                if count < num_best:
+        #               print w, pears_scores[w]
+                        pears.append(w)
+                        count+=1
+                else:
+                        break
 
 	#####################
 	#Output helpful pears
