@@ -213,12 +213,14 @@ def output(best_urls,query):
 def runScript(pears,query):
 	readDM()
 	query_dist=mkQueryDist(query)
-	for pear in pears:
-		#print pear
-		loadURLs(pear)
-		loadWordClouds(pear)
-		scoreDocs(query_dist,pear)
-	best_urls=bestURLs(doc_scores)
+	best_urls=[]
+        if len(pears) > 0:
+		for pear in pears:
+			#print pear
+			loadURLs(pear)
+			loadWordClouds(pear)
+			scoreDocs(query_dist,pear)
+		best_urls=bestURLs(doc_scores)
 	return output(best_urls,query)	
 
 if __name__ == '__main__':
