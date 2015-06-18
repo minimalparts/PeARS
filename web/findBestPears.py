@@ -1,6 +1,7 @@
 ################################################################
-#topicaliseQueryBrowser.py
-#USAGE: to be called by mkQueryPage.py when user enters a query
+#findBestPeARS.py identifies best pears on the network for a 
+#particular query.
+#USAGE: called by mkQueryPage.py when user enters a query
 ################################################################
 
 from numpy import *
