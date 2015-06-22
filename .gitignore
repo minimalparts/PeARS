@@ -66,3 +66,7 @@ target/
 app.db
 wikiwoods.db
 history.db
+.pyc
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+*~
