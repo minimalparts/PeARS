@@ -1,5 +1,5 @@
 ################################################################
-#findBestPeARS.py identifies best pears on the network for a 
+#findBestPeARS.py identifies best pears on the network for a
 #particular query.
 #USAGE: called by mkQueryPage.py when user enters a query
 ################################################################
@@ -15,8 +15,7 @@ import time
 
 
 
-path_to_PeARS="/home/aurelie/PeARS/web/"
-shared_pears_ids=path_to_PeARS+"shared_pears_ids.txt"
+shared_pears_ids= os.path.join(os.path.dirname(__file__),"shared_pears_ids.txt")
 dm_dict={}		#Dictionary to store dm file
 
 
@@ -50,7 +49,7 @@ def cosine_distance(a, b):
 #################################################
 
 def readDM():
-	with open(path_to_PeARS+"wikiwoods.dm") as f:
+	with open(os.path.join(os.path.dirname(__file__),"wikiwoods.dm")) as f:
 		dmlines=f.readlines()
 		f.close()
 
@@ -78,7 +77,7 @@ def mkQueryDist(query):
 			w=m.group(1).lower()
 		if w in dm_dict:
 #				print "Adding",w,"to vecs_to_add"
-			vecs_to_add.append(w)	
+			vecs_to_add.append(w)
 
 	vbase=array([])
 	#Add vectors together
@@ -87,10 +86,10 @@ def mkQueryDist(query):
 		vbase=array(dm_dict[base])
 		for item in range(1,len(vecs_to_add)):
 #				print item,"Adding vector",vecs_to_add[item]
-			vbase=vbase+array(dm_dict[vecs_to_add[item]]) 	
-	
+			vbase=vbase+array(dm_dict[vecs_to_add[item]])
+
 	return vbase
-	
+
 
 
 ###################################################
@@ -148,12 +147,12 @@ def runScript(query):
 	readDM()
 	best_pears=[]
 	query_dist=mkQueryDist(query)
-		
+
 	#############################################################
 	#Calculate score for each pear in relation to the user query
 	#############################################################
 
-	if len(query_dist) > 0:	
+	if len(query_dist) > 0:
 		sp=open(shared_pears_ids,'r')
 		pears=sp.readlines()
 		sp.close()
@@ -168,7 +167,7 @@ def runScript(query):
 #			print pear_name,cosine_distance(pear_dist,query_dist)
 			score=cosine_distance(pear_dist,query_dist)
 			pears_scores[pear_name]=score
-		
+
 		best_pears=outputBestPears(pears_scores)
 	return best_pears
 
