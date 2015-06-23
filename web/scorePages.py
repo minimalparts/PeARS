@@ -1,7 +1,7 @@
 #######################################################################
 # ./scorePages.py compares the query to each document
 # Called by ./mkQueryPage.py
-####################################################################### 
+#######################################################################
 
 from operator import itemgetter, attrgetter
 from numpy import *
@@ -60,7 +60,7 @@ def cosine_distance(a, b):
 #################################################
 
 def readDM():
-	with open(path_to_PeARS+"wikiwoods.dm") as f:
+	with open(os.path.join(os.path.dirname(__file__),"wikiwoods.dm")) as f:
 		dmlines=f.readlines()
 		f.close()
 
@@ -104,7 +104,7 @@ def mkQueryDist(query):
 			w=m.group(1).lower()
 		if w in dm_dict:
 #				print "Adding",w,"to vecs_to_add"
-			vecs_to_add.append(w)	
+			vecs_to_add.append(w)
 
 	vbase=array([])
 	#Add vectors together
@@ -113,8 +113,8 @@ def mkQueryDist(query):
 		vbase=array(dm_dict[base])
 		for item in range(1,len(vecs_to_add)):
 #				print item,"Adding vector",vecs_to_add[item]
-			vbase=vbase+array(dm_dict[vecs_to_add[item]]) 	
-	
+			vbase=vbase+array(dm_dict[vecs_to_add[item]])
+
 	return vbase
 
 ##############################################
@@ -130,8 +130,8 @@ def loadWordClouds(pear):
 		url_wordclouds[url_dict[fields[0]]]=fields[1]
 
 	word_clouds.close()
-		
-	
+
+
 ################################################
 # Score documents for a pear
 ################################################
@@ -180,11 +180,11 @@ def bestURLs(doc_scores):
 
 def output(best_urls,query):
 	results=[]
-#	print query	
+#	print query
 	#If documents matching the query were found on the pear network...
 	if len(best_urls) > 0:
 		for u in best_urls:
-			results.append([u,url_wordclouds[u]])			
+			results.append([u,url_wordclouds[u]])
 #			print "Getting snippet for",u
 #			snippet=returnSnippet.runScript(query,pear,reverse_url_dict[u])
 #			results.append([u,snippet])
@@ -221,7 +221,7 @@ def runScript(pears,query):
 			loadWordClouds(pear)
 			scoreDocs(query_dist,pear)
 		best_urls=bestURLs(doc_scores)
-	return output(best_urls,query)	
+	return output(best_urls,query)
 
 if __name__ == '__main__':
     runScript(sys.argv[1], sys.argv[2])
