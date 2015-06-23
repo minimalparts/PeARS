@@ -1,14 +1,10 @@
 ###################################################################
 # ./mkQueryPage starts a web server to take and process user search
 ###################################################################
-
-
-
 import findBestPears
 import scorePages
 import textblob_aptagger
-from textblob import TextBlob
-from textblob import Word
+from textblob import TextBlob,Word
 import web
 from web import form
 
@@ -16,9 +12,7 @@ from web import form
 # Start POS tagger
 #########################################
 
-
 pt=textblob_aptagger.PerceptronTagger()
-
 
 #######################################
 # Tag query
@@ -59,36 +53,39 @@ render = web.template.render('templates/')
 urls = ('/', 'index')
 app = web.application(urls, globals())
 
-myform = form.Form( 
-    form.Textbox("search", 
-        form.notnull))
+myform = form.Form(
+    form.Textbox("search",
+                 form.notnull))
 
-class index: 
-    def GET(self): 
+class index:
+
+    def GET(self):
         form = myform()
         # make sure you create a copy of the form by calling it (line above)
         # Otherwise changes will appear globally
         return render.searchform(form)
-    def POST(self): 
-        form = myform() 
-        if not form.validates(): 
+
+    def POST(self):
+        form = myform()
+        if not form.validates():
             return render.searchform(form)
-        else:
-	    query=form['search'].value
-	    #print pt.tag(query)
-	    taggedquery=tagQuery(query)
-#	    print taggedquery
-	    pears=findBestPears.runScript(taggedquery)
-#	    print "The best pears are: ",pears
-	    pear_names=[]
-	    for p in pears:
-		pear_names.append(p[0])
-	    pages=scorePages.runScript(pear_names,taggedquery)
 
-	    if len(pears) == 0:						#When no results were found...
-		pears=[['nopear','Sorry... no pears found :(','./static/pi-pic.png']]				#Hack to have something to display in the pears area of results page
+        query=form['search'].value
+        #print pt.tag(query)
+        taggedquery=tagQuery(query)
+        #print taggedquery
+        pears=findBestPears.runScript(taggedquery)
+        #print "The best pears are: ",pears
+        pear_names=[]
+        for p in pears:
+            pear_names.append(p[0])
+        pages=scorePages.runScript(pear_names,taggedquery)
 
-	    return render.results(pears,pages,query)
+        if len(pears) == 0:						#When no results were found...
+            pears=[['nopear','Sorry... no pears found :(','./static/pi-pic.png']]				#Hack to have something to display in the pears area of results page
+
+
+        return render.results(pears,pages,query)
 
 if __name__=="__main__":
     web.internalerror = web.debugerror
