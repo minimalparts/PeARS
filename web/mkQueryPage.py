@@ -7,6 +7,7 @@ import textblob_aptagger
 from textblob import TextBlob,Word
 import web
 from web import form
+import os
 
 #########################################
 # Start POS tagger
@@ -48,7 +49,7 @@ def tagQuery(query):
 ###############################
 
 
-render = web.template.render('templates/')
+render = web.template.render(os.path.join(os.path.dirname(__file__),'templates/'))
 
 urls = ('/', 'index')
 app = web.application(urls, globals())
