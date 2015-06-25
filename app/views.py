@@ -9,6 +9,10 @@ from textblob import TextBlob,Word
 import web
 from web import form
 import os
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
+
 #from forms import SearchForm
 
 #########################################

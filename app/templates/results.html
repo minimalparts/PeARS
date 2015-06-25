@@ -16,7 +16,7 @@
 		<table>
         {% for r in results %}
 		<!--	<tr><td><a href="r[0]">r[0]</a></td></tr> -->
-        <tr><td><a href="{{ r[0] }}">{{ r[0] }}</a><br>{{ r[1] }}<br><br></td></tr>
+        <tr><td><a href="{{ r[0] }}">{{r[0]}}</a><br>{{r[1]}}<br><br></td></tr>
 		<!-- 		<tr><td><a href="$r">$r</a><br><br><br></td></tr> -->
         {% endfor %}
 		</table>
@@ -25,7 +25,7 @@
         {% for p in pears %}
 			<div id="wrapper">
                 <img src={{ p[2] }} class="hover" width="50px"/>
-                <p class="text">{{ p[1] }}</p>
+                <p class="text">{{p[1]}}</p>
 			</div><br>
         {% endfor %}
 <!-- 			<td><div style="width:60px;height:60px;-webkit-border-radius: 10px;-moz-border-radius: 10px;border-radius: 10px;background-color:#A349A4; vertical-align: middle;">
