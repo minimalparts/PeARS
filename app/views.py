@@ -7,6 +7,6 @@ from app import app, db
 @app.route('/')
 @app.route('/index')
 def index():
-    return render_template("searchform.html")
+    return render_template("index.html")
 
 
