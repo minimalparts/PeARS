@@ -54,25 +54,24 @@ def tagQuery(query):
 @app.route('/')
 @app.route('/index')
 def index():
-    return render_template("index.html")
+    query =request.args.get('q')
+    if not query:
+        return render_template("index.html")
+    else:
 
-@app.route('/search', methods = ['POST'])
-def search():
-    query = request.form['q']
-    #print pt.tag(query)
-    taggedquery=tagQuery(query)
-    #print taggedquery
-    pears=findBestPears.runScript(taggedquery)
-    #print "The best pears are: ",pears
-    pear_names=[]
-    for p in pears:
-        pear_names.append(p[0])
-    pages=scorePages.runScript(pear_names,taggedquery)
+        #taggedquery=tagQuery(query)
+        #pears=findBestPears.runScript(taggedquery)
+        #pear_names=[]
+        #for p in pears:
+        #    pear_names.append(p[0])
+        #pages=scorePages.runScript(pear_names,taggedquery)
+        #if len(pears) == 0:
+        #    pears=[['nopear','Sorry... no pears found :(','./static/pi-pic.png']]
 
-    if len(pears) == 0:						#When no results were found...
-        pears=[['nopear','Sorry... no pears found :(','./static/pi-pic.png']]				#Hack to have something to display in the pears area of results page
+        '''remove the following lines after testing'''
+        pears = ['test','test2']
+        pages = [['http://test.com','test']]
 
-    return render_template('results.html', pears=pears, query=query, results=pages)
-
+        return render_template('results.html', pears=pears, query=query, results=pages)
 
 

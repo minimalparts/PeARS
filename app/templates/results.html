@@ -1,37 +1,87 @@
-<head><title>PeARS search</title>
-<link rel="stylesheet" href="./static/main.css">
-</head>
-<!---<body style="background-color: #00A2E8"> -->
-<body>
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png')}}">
+		<meta charset="utf-8">
+		<title>PeARS Search</title>
+		<meta name="generator" content="Bootply" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<link href="{{ url_for('static', filename='css/bootstrap.min.css')}}" rel="stylesheet">
+		<!--[if lt IE 9]>
+			<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<link href="{{ url_for('static', filename='css/simple-sidebar.css')}}" rel="stylesheet">
+	</head>
+	<body>
+<div id="wrapper">
 
-<div id='container'>
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            <ul class="sidebar-nav">
+                <li class="sidebar-brand">
+                    <a href="#">
+                        <a href="{{ url_for('index')}}"><img src="{{ url_for('static', filename='pears-logo-small.png')}}"></a>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">Dashboard</a>
+                </li>
+                <li>
+                    <a href="#">Shortcuts</a>
+                </li>
+                <li>
+                    <a href="#">Overview</a>
+                </li>
+                <li>
+                    <a href="#">Events</a>
+                </li>
+                <li>
+                    <a href="#">About</a>
+                </li>
+                <li>
+                    <a href="#">Services</a>
+                </li>
+                <li>
+                    <a href="#">Contact</a>
+                </li>
+                <li>
+                                        <a href="#menu-toggle" class="btn btn-default" id="menu-toggle2">Toggle Menu</a>
+                </li>
+            </ul>
+            
+        </div>
+        <!-- /#sidebar-wrapper -->
 
-	<div id='results'>
-	<!--- <img src="./static/pears-logo-small.png" style="display: block; margin-left: auto; margin-right: auto; height: 100px;"> -->
-		<a href="http://localhost:8080/"><img src="./static/pears-logo-small.png"></a><br><br>
-        <b>Query: {{ query }}</b><br>
-		<b>You got the following recommendations... </b>
-		<br><br>
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h1>Simple Sidebar</h1>
+                        <p>This template has a responsive menu toggling system. The menu will appear collapsed on smaller screens, and will appear non-collapsed on larger screens. When toggled using the button below, the menu will appear/disappear. On small screens, the page content will be pushed off canvas.</p>
+                        <p>Make sure to keep all page content within the <code>#page-content-wrapper</code>.</p>
+                        <a href="#menu-toggle" class="btn btn-default" id="menu-toggle">Toggle Menu</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /#page-content-wrapper -->
 
-		<table>
-        {% for r in results %}
-		<!--	<tr><td><a href="r[0]">r[0]</a></td></tr> -->
-        <tr><td><a href="{{ r[0] }}">{{r[0]}}</a><br>{{r[1]}}<br><br></td></tr>
-		<!-- 		<tr><td><a href="$r">$r</a><br><br><br></td></tr> -->
-        {% endfor %}
-		</table>
-	</div>
-	<div id='recommenders'>
-        {% for p in pears %}
-			<div id="wrapper">
-                <img src={{ p[2] }} class="hover" width="50px"/>
-                <p class="text">{{p[1]}}</p>
-			</div><br>
-        {% endfor %}
-<!-- 			<td><div style="width:60px;height:60px;-webkit-border-radius: 10px;-moz-border-radius: 10px;border-radius: 10px;background-color:#A349A4; vertical-align: middle;">
-			  <a class="hovertext" href="#" title="$p[2]"><img src=$p[1] width="50px" style="margin: 5px;"></a>
-			</div>
-			</td> -->
-	</div>
-</div>
+    </div>
+    <!-- /#wrapper -->
+
+    <!-- jQuery -->
+    <script src="{{ url_for('static', filename='js/jquery.js')}}"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js')}}"></script>
+
+    <!-- Menu Toggle Script -->
+    <script>
+    $("#menu-toggle,#menu-toggle2").click(function(e) {
+        e.preventDefault();
+        $("#wrapper").toggleClass("toggled");
+    });
+    </script>
 </body>
