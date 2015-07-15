@@ -5,6 +5,9 @@
  */
 
 /* Toggle Styles */
+.navbar {
+  margin-bottom: 0px;
+}
 
 #wrapper {
     padding-right: 0;
@@ -26,7 +29,7 @@
     width: 0;
     height: 100%;
     margin-right: -250px;
-    background: #000;
+    background: #e7e7e7;
     -webkit-transition: all 0.5s ease;
     -moz-transition: all 0.5s ease;
     -o-transition: all 0.5s ease;

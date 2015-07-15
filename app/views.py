@@ -59,17 +59,18 @@ def index():
         return render_template("index.html")
     else:
 
-        #taggedquery=tagQuery(query)
-        #pears=findBestPears.runScript(taggedquery)
-        #pear_names=[]
-        #for p in pears:
-        #    pear_names.append(p[0])
+        taggedquery=tagQuery(query)
+        pears=findBestPears.runScript(taggedquery)
+        pear_names=[]
+        for p in pears:
+            pear_names.append(p[0])
+            print p
         #pages=scorePages.runScript(pear_names,taggedquery)
-        #if len(pears) == 0:
-        #    pears=[['nopear','Sorry... no pears found :(','./static/pi-pic.png']]
+        if len(pears) == 0:
+            pears=[['nopear','Sorry... no pears found :(','./static/pi-pic.png']]
+            print pears
 
         '''remove the following lines after testing'''
-        pears = ['test','test2']
         pages = [['http://test.com','test']]
 
         return render_template('results.html', pears=pears, query=query, results=pages)

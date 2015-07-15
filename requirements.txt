@@ -12,4 +12,4 @@ Jinja2==2.7.3
 MarkupSafe==0.23
 SQLAlchemy==1.0.5
 Werkzeug==0.10.4
-
+-e git+https://github.com/sloria/textblob-aptagger.git@92a9b99f6f49cf8137212b8fab4555f35d196a11#egg=textblob-aptagger-master
