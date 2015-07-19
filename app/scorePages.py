@@ -5,8 +5,6 @@
 
 from operator import itemgetter, attrgetter
 from numpy import *
-import scipy
-from scipy.spatial.distance import cosine as scipy_cos_dist
 import subprocess
 import collections
 import webbrowser
@@ -46,12 +44,23 @@ def print_timing(func):
 # Cosine function
 #############################################
 
-def cosine_distance(a, b):
-	a=scipy.array(a,dtype=float)
-	b=scipy.array(b,dtype=float)
-	if len(a) != len(b):
-		raise ValueError, "a and b must be same length"
-	return 1-scipy_cos_dist(a,b)
+def cosine_distance(peer_dist, query_dist):
+    if len(peer_dist) != len(query_dist):
+        raise ValueError, "Peer distance and query distance must be " \
+                " of same length"
+    num, den_a, den_b = (0 for i in range(3))
+    for i, j in zip(a, b):
+        num += i * j
+        den_a += i * i
+        den_b += j * j
+    return num / (sqrt(den_a) * sqrt(den_b))
+
+#def cosine_distance(a, b):
+	#a=scipy.array(a,dtype=float)
+	#b=scipy.array(b,dtype=float)
+	#if len(a) != len(b):
+		#raise ValueError, "a and b must be same length"
+	#return 1-scipy_cos_dist(a,b)
 
 
 #################################################
