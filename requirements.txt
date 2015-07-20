@@ -1,6 +1,5 @@
 nltk==3.0.3
 numpy==1.9.2
-scipy==0.15.1
 textblob==0.9.1
 web.py==0.37
 wheel==0.24.0
