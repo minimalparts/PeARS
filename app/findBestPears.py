@@ -39,7 +39,7 @@ def cosine_distance(peer_dist, query_dist):
         raise ValueError, "Peer distance and query distance must be " \
                 " of same length"
     num, den_a, den_b = (0 for i in range(3))
-    for i, j in zip(a, b):
+    for i, j in zip(peer_dist, query_dist):
         num += i * j
         den_a += i * i
         den_b += j * j
