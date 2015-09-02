@@ -122,7 +122,7 @@ def outputBestPears(pears_scores):
 		pi_name=""
 		pi_picture=""
 		pi_message=""
-		base_url=pear
+		base_url=pear + '/'
 		profile_file=urllib.urlopen(base_url+"profile.txt")
 
 		profile.append(pear)
