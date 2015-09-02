@@ -40,9 +40,9 @@ def cosine_distance(peer_dist, query_dist):
                 " of same length"
     num, den_a, den_b = (0 for i in range(3))
     for i, j in zip(peer_dist, query_dist):
-        num += int(i) * int(j)
-        den_a += int(i) * int(i)
-        den_b += int(j) * int(j)
+        num += double(i) * double(j)
+        den_a += double(i) * double(i)
+        den_b += double(j) * double(j)
     return num / (sqrt(den_a) * sqrt(den_b))
 
 
