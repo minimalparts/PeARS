@@ -48,11 +48,13 @@
                         <b>Peers</b>
                     
                 </li>
-                {% for p in peers %}
+                {% for p in pears %}
 
-                <li>
-                    <img src=$p[2] class="hover" width="50px"/>
-                    <p class="text">$p[1]</p>
+                <li> <center>
+                    <img src={{p[2]}} class="hover" width="50px"/>
+                    <p class="text"><b>{{p[1]}}</b></p>
+                    </center>
+                    <hr/>
                 </li>
                 {% endfor %}
                 
@@ -64,11 +66,15 @@
         <!-- Page Content -->
         <div id="page-content-wrapper">
             <div class="container-fluid">
+            {% for result in results %}
                 <div class="row">
                     <div class="col-lg-12">
-                     
+                     <h3> {{result[1]}}</h3>
+                     {{result[1]}}  ... <a href="{{result[0]}}" > Read more </a>
+                     <hr/>
                     </div>
                 </div>
+                {% endfor %}
             </div>
         </div>
         <!-- /#page-content-wrapper -->
