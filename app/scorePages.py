@@ -45,24 +45,14 @@ def print_timing(func):
 # Cosine function
 #############################################
 
-def cosine_distance(peer_dist, query_dist):
-    if len(peer_dist) != len(query_dist):
-        raise ValueError("Peer distance and query distance must be "
+def cosine_similarity(peer_v, query_v):
+    if len(peer_v) != len(query_v):
+        raise ValueError("Peer vector and query vector must be "
                          " of same length")
-    num, den_a, den_b = (0 for i in range(3))
-    for i, j in zip(peer_dist, query_dist):
-        num += double(i) * double(j)
-        den_a += double(i) * double(i)
-        den_b += double(j) * double(j)
+    num=multiply(peer_v,query_v).sum()
+    den_a=multiply(peer_v,peer_v).sum()
+    den_b=multiply(query_v,query_v).sum()
     return num / (sqrt(den_a) * sqrt(den_b))
-
-# def cosine_distance(a, b):
-    # a=scipy.array(a,dtype=float)
-    # b=scipy.array(b,dtype=float)
-    # if len(a) != len(b):
-    #raise ValueError, "a and b must be same length"
-    # return 1-scipy_cos_dist(a,b)
-
 
 #################################################
 # Read dm file
@@ -162,8 +152,9 @@ def scoreDocs(query_dist, pear):
         l = l.rstrip('\n')
         doc_id = l.split(':')[0]
         doc_dist = array(l.split(':')[1].split())
-#		print doc_id,cosine_distance(doc_dist,query_dist)
-        score = cosine_distance(doc_dist, query_dist)
+	doc_dist = [double(i) for i in doc_dist]
+#		print doc_id,cosine_similarity(doc_dist,query_dist)
+        score = cosine_similarity(doc_dist, query_dist)
         doc_scores[url_dict[doc_id]] = score
 #		url_wordclouds[url_dict[doc_id]]=getWordCloud(pear,doc_id)
     return doc_scores

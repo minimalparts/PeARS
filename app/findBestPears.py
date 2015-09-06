@@ -31,19 +31,17 @@ def print_timing(func):
 
 #############################################
 # Cosine function
-# Copied from http://stackoverflow.com/questions/1823293/optimized-method-for-calculating-cosine-distance-in-python
 #############################################
 
-def cosine_distance(peer_dist, query_dist):
-    if len(peer_dist) != len(query_dist):
-        raise ValueError("Peer distance and query distance must be "
+def cosine_similarity(peer_v, query_v):
+    if len(peer_v) != len(query_v):
+        raise ValueError("Peer vector and query vector must be "
                          " of same length")
-    num, den_a, den_b = (0 for i in range(3))
-    for i, j in zip(peer_dist, query_dist):
-        num += double(i) * double(j)
-        den_a += double(i) * double(i)
-        den_b += double(j) * double(j)
+    num=multiply(peer_v,query_v).sum()
+    den_a=multiply(peer_v,peer_v).sum()
+    den_b=multiply(query_v,query_v).sum()
     return num / (sqrt(den_a) * sqrt(den_b))
+
 
 
 #################################################
@@ -149,26 +147,24 @@ def runScript(query):
     # load a semantic space
     readDM()
     best_pears = []
-    query_dist = mkQueryDist(query)
+    query_v = mkQueryDist(query)
 
     #############################################################
     # Calculate score for each pear in relation to the user query
     #############################################################
 
-    if len(query_dist) > 0:
+    if len(query_v) > 0:
         sp = open(shared_pears_ids, 'r')
         pears = sp.readlines()
         sp.close()
 
         pears_scores = {}
         for l in pears:
-            scoreSIM = 0.0  # Initialise score for similarity
-
             l = l.rstrip('\n')
             pear_name = l.split('|')[0]
-            pear_dist = array(l.split('|')[1].split())
-#			print pear_name,cosine_distance(pear_dist,query_dist)
-            score = cosine_distance(pear_dist, query_dist)
+            pear_v = array(l.split('|')[1].split())
+	    pear_v = [double(i) for i in pear_v]
+            score = cosine_similarity(pear_v, query_v)
             pears_scores[pear_name] = score
 
         best_pears = outputBestPears(pears_scores)
