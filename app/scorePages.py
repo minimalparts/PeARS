@@ -14,6 +14,8 @@ import re
 import time
 import os
 
+import getUrlOverlap
+
 # Change this line to your PeARS folder path
 dm_dict = {}  # Dictionary to store dm file
 url_dict = {}  # Dictionary file ids - urls
@@ -135,28 +137,60 @@ def loadWordClouds(pear):
     word_clouds.close()
 
 
-################################################
-# Score documents for a pear
-################################################
+
+
+###############################################
+# Get distributional score
+###############################################
 
 @print_timing
-def scoreDocs(query_dist, pear):
+def scoreDS(query_dist, pear):
     dd = urllib.urlopen(pear + "/doc.dists.txt")
     doc_dists = dd.readlines()
     dd.close()
     # print "Done reading dd"
 
+    DS_scores={}
     for l in doc_dists:
-        scoreSIM = 0.0  # Initialise score for similarity
-
         l = l.rstrip('\n')
         doc_id = l.split(':')[0]
         doc_dist = array(l.split(':')[1].split())
 	doc_dist = [double(i) for i in doc_dist]
 #		print doc_id,cosine_similarity(doc_dist,query_dist)
         score = cosine_similarity(doc_dist, query_dist)
-        doc_scores[url_dict[doc_id]] = score
-#		url_wordclouds[url_dict[doc_id]]=getWordCloud(pear,doc_id)
+        DS_scores[url_dict[doc_id]] = score	
+		#url_wordclouds[url_dict[doc_id]]=getWordCloud(pear,doc_id)
+    return DS_scores
+
+
+###############################################
+# Get url overlap score
+###############################################
+
+@print_timing
+def scoreURL(query):
+    q=re.sub("_.", '', query)
+    URL_scores={}
+    for k,v in url_dict.items():
+	URL_scores[v]=getUrlOverlap.runScript(q,v)
+		#print query,v,URL_scores[v]
+    return URL_scores
+
+################################################
+# Score documents for a pear
+################################################
+
+@print_timing
+def scoreDocs(query, query_dist, pear):
+    DS_scores=scoreDS(query_dist,pear)
+    URL_scores=scoreURL(query)
+    for k,v in url_dict.items():
+	if v in DS_scores and v in URL_scores:
+                if URL_scores[v] > 0.7 and DS_scores[v] > 0.3:                                      #If URL overlap high and similarity okay
+                        print v, DS_scores[v], URL_scores[v]
+                        doc_scores[v]=DS_scores[v]+URL_scores[v]*0.2                                #Boost DS score by a maximum of 0.2 (thresholds to be updated when we have proper evaluation data)
+		else:
+			doc_scores[v]=DS_scores[v]
     return doc_scores
 
 #################################################
@@ -229,7 +263,7 @@ def runScript(pears, query):
             # print pear
             loadURLs(pear)
             loadWordClouds(pear)
-            scoreDocs(query_dist, pear)
+            scoreDocs(query, query_dist, pear)
         best_urls = bestURLs(doc_scores)
     return output(best_urls, query)
 
