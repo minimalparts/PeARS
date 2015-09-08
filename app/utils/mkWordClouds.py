@@ -81,6 +81,7 @@ def calculateTFIDF():
 
 
 def computeWordClouds():
+	non_alpha = re.compile('[\W_]+')                                        #non-alpha characters   
 	for doc_name,tfidf_dict in tfidfs.items():
 		cloud=""
 		c=0
@@ -90,8 +91,11 @@ def computeWordClouds():
 			else:
 				m=re.search("_N|_V|_A",k)
 				if m:
-					cloud=cloud+k[0:-2]+" "
-					c+=1
+                                        word=k[0:-2]
+                                        m2=non_alpha.search(word)
+                                        if not m2 and word.lower() not in cloud.lower():                #if word alphanumeric and is not already in cloud
+                                                cloud=cloud+word+" "
+                                                c+=1
 		cloud.rstrip(' ')
 		word_clouds[doc_name]=cloud
 
