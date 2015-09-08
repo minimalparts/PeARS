@@ -69,7 +69,7 @@ def index():
         for p in pears:
             pear_names.append(p[0])
             print p
-        pages=scorePages.runScript(pear_names,taggedquery)
+        pages = scorePages.runScript(pear_names, taggedquery)
         if len(pears) == 0:
             pears = [['nopear',
                       'Sorry... no pears found :(',
