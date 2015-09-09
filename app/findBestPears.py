@@ -10,6 +10,7 @@ import sys
 import re
 import os
 import time
+import pdb
 
 
 shared_pears_ids = os.path.join(
@@ -37,11 +38,10 @@ def cosine_similarity(peer_v, query_v):
     if len(peer_v) != len(query_v):
         raise ValueError("Peer vector and query vector must be "
                          " of same length")
-    num=multiply(peer_v,query_v).sum()
-    den_a=multiply(peer_v,peer_v).sum()
-    den_b=multiply(query_v,query_v).sum()
+    num = dot(peer_v, query_v)
+    den_a = dot(peer_v, peer_v)
+    den_b = dot(query_v, query_v)
     return num / (sqrt(den_a) * sqrt(den_b))
-
 
 
 #################################################
@@ -163,7 +163,7 @@ def runScript(query):
             l = l.rstrip('\n')
             pear_name = l.split('|')[0]
             pear_v = array(l.split('|')[1].split())
-	    pear_v = [double(i) for i in pear_v]
+            pear_v = [double(i) for i in pear_v]
             score = cosine_similarity(pear_v, query_v)
             pears_scores[pear_name] = score
 
