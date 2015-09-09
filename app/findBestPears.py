@@ -11,6 +11,7 @@ import re
 import os
 import time
 import pdb
+from .models import WikiWoods
 
 
 shared_pears_ids = os.path.join(
@@ -48,17 +49,17 @@ def cosine_similarity(peer_v, query_v):
 # Read dm file
 #################################################
 
-def readDM():
-    with open(os.path.join(os.path.dirname(__file__), "wikiwoods.dm")) as f:
-        dmlines = f.readlines()
-        f.close()
-
-    # Make dictionary with key=row, value=vector
-    for l in dmlines:
-        items = l.rstrip('\n').split('\t')
-        row = items[0]
-        vec = [float(i) for i in items[1:]]
-        dm_dict[row] = vec
+#def readDM():
+#    with open(os.path.join(os.path.dirname(__file__), "wikiwoods.dm")) as f:
+#        dmlines = f.readlines()
+#        f.close()
+#
+#    # Make dictionary with key=row, value=vector
+#    for l in dmlines:
+#        items = l.rstrip('\n').split('\t')
+#        row = items[0]
+#        vec = [float(i) for i in items[1:]]
+#        dm_dict[row] = vec
 
 
 ##############################################
@@ -74,19 +75,17 @@ def mkQueryDist(query):
         m = re.search('(.*_.).*', w)
         if m:
             w = m.group(1).lower()
-        if w in dm_dict:
-            #				print "Adding",w,"to vecs_to_add"
-            vecs_to_add.append(w)
+        word = WikiWoods.query.filter(WikiWoods.word==w).first()
+        if word:
+            vecs_to_add.append(word)
 
     vbase = array([])
     # Add vectors together
     if len(vecs_to_add) > 0:
         # Take first word in vecs_to_add to start addition
-        base = vecs_to_add[0]
-        vbase = array(dm_dict[base])
+        vbase = array([float(i) for i in vecs_to_add[0].vector.split(',')])
         for item in range(1, len(vecs_to_add)):
-            #				print item,"Adding vector",vecs_to_add[item]
-            vbase = vbase + array(dm_dict[vecs_to_add[item]])
+            vbase = vbase + array([float(i) for i in vecs_to_add[item].vector.split(',')])
 
     return vbase
 
@@ -144,8 +143,6 @@ def outputBestPears(pears_scores):
 # The @ decorator before the function invokes print_timing()
 @print_timing
 def runScript(query):
-    # load a semantic space
-    readDM()
     best_pears = []
     query_v = mkQueryDist(query)
 
