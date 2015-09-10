@@ -61,3 +61,7 @@ target/
 [._]*.s[a-w][a-z]
 [._]s[a-w][a-z]
 *~
+
+#don't track app.db - app's sql database
+app.db
+wikiwoods.dm

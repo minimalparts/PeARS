@@ -13,6 +13,7 @@ import sys
 import re
 import time
 import os
+from .findBestPears import mkQueryDist,cosine_similarity
 
 import getUrlOverlap
 
@@ -43,35 +44,6 @@ def print_timing(func):
 ##### Helpful functions end ##############################################
 
 
-#############################################
-# Cosine function
-#############################################
-
-def cosine_similarity(peer_v, query_v):
-    if len(peer_v) != len(query_v):
-        raise ValueError("Peer vector and query vector must be "
-                         " of same length")
-    num = multiply(peer_v, query_v).sum()
-    den_a = multiply(peer_v, peer_v).sum()
-    den_b = multiply(query_v, query_v).sum()
-    return num / (sqrt(den_a) * sqrt(den_b))
-
-#################################################
-# Read dm file
-#################################################
-
-
-def readDM():
-    with open(os.path.join(os.path.dirname(__file__), "wikiwoods.dm")) as f:
-        dmlines = f.readlines()
-        f.close()
-
-    # Make dictionary with key=row, value=vector
-    for l in dmlines:
-        items = l.rstrip('\n').split('\t')
-        row = items[0]
-        vec = [float(i) for i in items[1:]]
-        dm_dict[row] = vec
 
 ##############################################
 # Read url file
@@ -92,35 +64,6 @@ def loadURLs(pear):
         reverse_url_dict[url] = idfile
     d.close()
 
-##############################################
-# Make distribution for query
-##############################################
-
-
-def mkQueryDist(query):
-    words = query.rstrip('\n').split()
-
-    # Only retain arguments which are in the distributional semantic space
-    vecs_to_add = []
-    for w in words:
-        m = re.search('(.*_.).*', w)
-        if m:
-            w = m.group(1).lower()
-        if w in dm_dict:
-            #				print "Adding",w,"to vecs_to_add"
-            vecs_to_add.append(w)
-
-    vbase = array([])
-    # Add vectors together
-    if len(vecs_to_add) > 0:
-        # Take first word in vecs_to_add to start addition
-        base = vecs_to_add[0]
-        vbase = array(dm_dict[base])
-        for item in range(1, len(vecs_to_add)):
-            #				print item,"Adding vector",vecs_to_add[item]
-            vbase = vbase + array(dm_dict[vecs_to_add[item]])
-
-    return vbase
 
 ##############################################
 # Get word clouds for a pear
@@ -258,7 +201,6 @@ def output(best_urls, query):
 
 @print_timing
 def runScript(pears, query):
-    readDM()
     query_dist = mkQueryDist(query)
     best_urls = []
     if len(pears) > 0:
