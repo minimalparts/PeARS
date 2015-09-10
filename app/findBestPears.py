@@ -9,40 +9,13 @@ import urllib
 import sys
 import re
 import os
-import time
-import pdb
-from .models import WikiWoods
+from .utils import mkQueryDist, cosine_similarity, print_timing
 
 
 shared_pears_ids = os.path.join(
     os.path.dirname(__file__),
     "shared_pears_ids.txt")
 dm_dict = {}  # Dictionary to store dm file
-
-
-# Timing function, just to know how long things take
-def print_timing(func):
-    def wrapper(*arg):
-        t1 = time.time()
-        res = func(*arg)
-        t2 = time.time()
-        print '%s in findBestPears took %0.3f ms' % (func.func_name, (t2 - t1) * 1000.0)
-        return res
-    return wrapper
-
-
-#############################################
-# Cosine function
-#############################################
-
-def cosine_similarity(peer_v, query_v):
-    if len(peer_v) != len(query_v):
-        raise ValueError("Peer vector and query vector must be "
-                         " of same length")
-    num = dot(peer_v, query_v)
-    den_a = dot(peer_v, peer_v)
-    den_b = dot(query_v, query_v)
-    return num / (sqrt(den_a) * sqrt(den_b))
 
 
 #################################################
@@ -60,35 +33,6 @@ def cosine_similarity(peer_v, query_v):
 #        row = items[0]
 #        vec = [float(i) for i in items[1:]]
 #        dm_dict[row] = vec
-
-
-##############################################
-# Make distribution for query
-##############################################
-
-def mkQueryDist(query):
-    words = query.rstrip('\n').split()
-
-    # Only retain arguments which are in the distributional semantic space
-    vecs_to_add = []
-    for w in words:
-        m = re.search('(.*_.).*', w)
-        if m:
-            w = m.group(1).lower()
-        word = WikiWoods.query.filter(WikiWoods.word==w).first()
-        if word:
-            vecs_to_add.append(word)
-
-    vbase = array([])
-    # Add vectors together
-    if len(vecs_to_add) > 0:
-        # Take first word in vecs_to_add to start addition
-        vbase = array([float(i) for i in vecs_to_add[0].vector.split(',')])
-        for item in range(1, len(vecs_to_add)):
-            vbase = vbase + array([float(i) for i in vecs_to_add[item].vector.split(',')])
-
-    return vbase
-
 
 ###################################################
 # Sort scores and output n best pears

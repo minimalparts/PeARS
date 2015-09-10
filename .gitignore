@@ -64,4 +64,3 @@ target/
 
 #don't track app.db - app's sql database
 app.db
-wikiwoods.dm
