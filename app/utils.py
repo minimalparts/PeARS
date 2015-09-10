@@ -19,9 +19,9 @@ def cosine_similarity(peer_v, query_v):
     if len(peer_v) != len(query_v):
         raise ValueError("Peer vector and query vector must be "
                          " of same length")
-    num = multiply(peer_v, query_v).sum()
-    den_a = multiply(peer_v, peer_v).sum()
-    den_b = multiply(query_v, query_v).sum()
+    num = dot(peer_v, query_v)
+    den_a = dot(peer_v, peer_v)
+    den_b = dot(query_v, query_v)
     return num / (sqrt(den_a) * sqrt(den_b))
 
 
