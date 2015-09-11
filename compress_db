@@ -1,0 +1,3 @@
+#!/bin/bash
+
+ echo .dump | sqlite3 $1 | bzip2 -c >wikiwoods.dump.bz2
