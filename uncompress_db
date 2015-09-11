@@ -17,7 +17,7 @@ if ch == 'y':
     open(dump, 'wb').write(data)
     f = open(dump, 'r+')
     linenums = 9
-    s = [y for x, y in enumerate(f) if x not in [line-1 for line in range(linenums)]]
+    s = [y for x, y in enumerate(f) if x not in [line-1 for line in range(3,8)]]
     f.seek(0)
     f.write(''.join(s))
     f.truncate(f.tell())
