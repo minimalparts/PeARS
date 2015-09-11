@@ -3,7 +3,7 @@ import sqlite3, sys, os, bz2
 dumpfile = sys.argv[1] if len(sys.argv) > 1 else 'wikiwoods.dump.bz2'
 
 
-ch = raw_input("This will re-write the existing wikiwoods.dm. Continue?(y/n):").lower()
+ch = raw_input("This will re-write the existing wikiwoods.db. Continue?(y/n):").lower()
 
 if ch == 'y':
     try:
@@ -30,12 +30,10 @@ if ch == 'y':
     except:
         pass
 
-    # print "okay"
     with open(dump, 'r') as f:
         for line in f:
-            print line
             cursor.executescript(line)
 
-    # os.remove('wikiwoods.dump')
+    os.remove('wikiwoods.dump')
     print "wikiwoods.db has been populated!"
 
