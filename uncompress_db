@@ -34,6 +34,7 @@ if ch == 'y':
         for line in f:
             cursor.executescript(line)
 
+    con.close()
     os.remove('wikiwoods.dump')
     print "wikiwoods.db has been populated!"
 
