@@ -1,0 +1,39 @@
+#!/usr/bin/python
+import sqlite3, sys, os, bz2
+dumpfile = sys.argv[1] if len(sys.argv) > 1 else 'wikiwoods.dump.bz2'
+
+
+ch = raw_input("This will re-write the existing wikiwoods.db. Continue?(y/n):").lower()
+
+if ch == 'y':
+    try:
+        os.remove('wikiwoods.db')
+        os.remove('wikiwoods.dump')
+    except:
+        pass
+    zipfile = bz2.BZ2File(dumpfile)
+    data = zipfile.read()
+    dump = dumpfile[:-4]
+    open(dump, 'wb').write(data)
+    f = open(dump, 'r+')
+    s = [y for x, y in enumerate(f) if x not in [line-1 for line in range(3,9)]]
+    f.seek(0)
+    f.write(''.join(s))
+    f.truncate(f.tell())
+    f.close()
+
+    con = sqlite3.connect('wikiwoods.db')
+    cursor = con.cursor()
+    try:
+        cursor.executescript('CREATE TABLE wiki_woods (id INTEGER NOT NULL,word TEXT(65),vector TEXT,PRIMARY KEY (id));')
+    except:
+        pass
+
+    with open(dump, 'r') as f:
+        for line in f:
+            cursor.executescript(line)
+
+    con.close()
+    os.remove('wikiwoods.dump')
+    print "wikiwoods.db has been populated!"
+
