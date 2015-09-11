@@ -11,9 +11,8 @@ import webbrowser
 import urllib
 import sys
 import re
-import time
 import os
-from .findBestPears import mkQueryDist,cosine_similarity
+from .utils import mkQueryDist, cosine_similarity, print_timing
 
 import getUrlOverlap
 
@@ -26,25 +25,6 @@ url_wordclouds = {}  # Stores correspondence between url and word cloud for this
 # url_snippets={}         #Stores correspondence between url and best
 # snippet for this query
 
-##### Helpful functions ##################################################
-
-# Timing function, just to know how long things take
-
-
-def print_timing(func):
-    def wrapper(*arg):
-        t1 = time.time()
-        res = func(*arg)
-        t2 = time.time()
-        print '%s in scorePages took %0.3f ms' % (func.func_name, (t2 - t1) * 1000.0)
-        return res
-    return wrapper
-
-
-##### Helpful functions end ##############################################
-
-
-
 ##############################################
 # Read url file
 ##############################################
@@ -52,7 +32,9 @@ def print_timing(func):
 
 def loadURLs(pear):
     print "Loading URL dictionary for", pear
-    path_to_dict = pear + "urls.dict.txt"
+    if pear.endswith('/'):
+        pear = pear[:-1]
+    path_to_dict = pear + "/urls.dict.txt"
 
     d = urllib.urlopen(path_to_dict)
     for line in d:
