@@ -7,7 +7,7 @@ import scorePages
 import os
 import sys
 reload(sys)
-from posTagger import tagQuery
+from lemmatise import lemmatiseQuery
 sys.setdefaultencoding("utf-8")
 
 #from forms import SearchForm
@@ -22,13 +22,13 @@ def index():
         return render_template("index.html")
     else:
 
-        taggedquery = tagQuery(query)
-        pears = findBestPears.runScript(taggedquery)
+        lemmatised_query = lemmatiseQuery(query)
+        pears = findBestPears.runScript(lemmatised_query)
         pear_names = []
         for p in pears:
             pear_names.append(p[0])
             print p
-        pages = scorePages.runScript(pear_names, taggedquery)
+        pages = scorePages.runScript(pear_names, lemmatised_query)
         if len(pears) == 0:
             pears = [['nopear',
                       'Sorry... no pears found :(',

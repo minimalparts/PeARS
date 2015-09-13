@@ -37,6 +37,7 @@ def loadURLs(pear):
     path_to_dict = pear + "/urls.dict.txt"
 
     d = urllib.urlopen(path_to_dict)
+    #d = open(path_to_dict)
     for line in d:
         line = line.rstrip('\n')
         idfile = line.split()[0]
@@ -55,6 +56,7 @@ def loadURLs(pear):
 def loadWordClouds(pear):
     print "Loading word clouds..."
     word_clouds = urllib.urlopen(pear + "/wordclouds.txt")
+    #word_clouds = open(pear + "/wordclouds.txt")
     for l in word_clouds:
         l = l.rstrip('\n')
         fields = l.split(':')
@@ -70,6 +72,7 @@ def loadWordClouds(pear):
 @print_timing
 def scoreDS(query_dist, pear):
     dd = urllib.urlopen(pear + "/doc.dists.txt")
+    #dd = open(pear + "/doc.dists.txt")
     doc_dists = dd.readlines()
     dd.close()
     # print "Done reading dd"
@@ -80,7 +83,7 @@ def scoreDS(query_dist, pear):
         doc_id = l.split(':')[0]
         doc_dist = array(l.split(':')[1].split())
         doc_dist = [double(i) for i in doc_dist]
-#		print doc_id,cosine_similarity(doc_dist,query_dist)
+	#print url_dict[doc_id],cosine_similarity(doc_dist,query_dist)
         score = cosine_similarity(doc_dist, query_dist)
         DS_scores[url_dict[doc_id]] = score
         # url_wordclouds[url_dict[doc_id]]=getWordCloud(pear,doc_id)
@@ -111,8 +114,7 @@ def scoreDocs(query, query_dist, pear):
     URL_scores = scoreURL(query)
     for k, v in url_dict.items():
         if v in DS_scores and v in URL_scores:
-            if URL_scores[v] > 0.7 and DS_scores[
-                    v] > 0.3:  # If URL overlap high and similarity okay
+            if URL_scores[v] > 0.7 and DS_scores[v] > 0.4:  # If URL overlap high and similarity okay
                 print v, DS_scores[v], URL_scores[v]
                 # Boost DS score by a maximum of 0.2 (thresholds to be updated
                 # when we have proper evaluation data)
@@ -131,9 +133,9 @@ def bestURLs(doc_scores):
     c = 0
     for w in sorted(doc_scores, key=doc_scores.get, reverse=True):
         if c < 10:
-            if doc_scores[w] > 0.3:  # Threshold - page must be good enough
+            if doc_scores[w] > 0.4:  # Threshold - page must be good enough
                 best_urls.append(w)
-#				print w, doc_scores[w]
+		print w, doc_scores[w]
             c += 1
         else:
             break
@@ -161,9 +163,7 @@ def output(best_urls, query):
         print "No suitable pages found."
         duckquery = ""
         for w in query.rstrip('\n').split():
-            m = re.search('(.*)_.', w)
-            if m:
-                duckquery = duckquery + m.group(1) + "+"
+            duckquery = duckquery + w + "+"
 #		print duckquery
         webbrowser.open_new_tab(
             "https://duckduckgo.com/?q=" +
