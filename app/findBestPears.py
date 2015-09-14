@@ -44,7 +44,7 @@ def outputBestPears(pears_scores):
     count = 0
     for w in sorted(pears_scores, key=pears_scores.get, reverse=True):
         if count < num_best:
-            #               print w, pears_scores[w]
+            print w, pears_scores[w]
             pears.append(w)
             count += 1
         else:

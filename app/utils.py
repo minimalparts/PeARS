@@ -35,12 +35,15 @@ def mkQueryDist(query):
     # Only retain arguments which are in the distributional semantic space
     vecs_to_add = []
     for w in words:
-        m = re.search('(.*_.).*', w)
-        if m:
-            w = m.group(1).lower()
         word = WikiWoods.query.filter(WikiWoods.word==w).first()
         if word:
             vecs_to_add.append(word)
+        else:
+            w=w[0].upper()+w[1:]                                                #Did user carelessly forget to capitalise a proper noun?
+            word = WikiWoods.query.filter(WikiWoods.word==w).first()
+            if word:
+                vecs_to_add.append(word)
+
 
     vbase = array([])
     # Add vectors together
