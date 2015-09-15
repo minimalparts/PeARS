@@ -114,6 +114,8 @@ def scoreDocs(query, query_dist, pear):
     URL_scores = scoreURL(query)
     for k, v in url_dict.items():
         if v in DS_scores and v in URL_scores:
+#	    if DS_scores[v] > 0.4:
+#		print v, DS_scores[v]
             if URL_scores[v] > 0.7 and DS_scores[v] > 0.4:  # If URL overlap high and similarity okay
                 print v, DS_scores[v], URL_scores[v]
                 # Boost DS score by a maximum of 0.2 (thresholds to be updated
