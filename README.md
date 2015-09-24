@@ -54,6 +54,16 @@ To know more head over to: <a href="http://aurelieherbelot.net/pears/">http://au
 
     `python -m textblob.download_corpora lite`
 
+3. <b>Get the semantic space</b>
+
+   In the root directory of the repo, run 
+
+   `wget aurelieherbelot.net/pears-demo/wikiwoods.dump.bz2`
+
+   then
+
+   `./uncompress_db wikiwoods.dump.bz2`
+
 
 ###Running the PeARS search engine
 
