@@ -45,6 +45,7 @@ def retrieve_pages():
     for row in rows:
         id = row["Id"]
         url = str(row['URL'])
+        # url = str('http://www.ubuntu.com')
 
         if url.endswith(('.gz', '.zip', '.exe', '.pdf', '.jpeg', '.jpg', '.7z', '.iso', '.img', '.png', '.svg',
                          'mp4', '.mp3', 'ogg', '.avi', '.wma', '.wmv', '.gif', '.rpm', '.deb', '.mkv', '.rar',
@@ -72,11 +73,12 @@ def retrieve_pages():
 
                     if title is None:
                         title = u'Untitled'
-                    for x in bs_obj.find_all(['script', 'style']):
+                    for x in bs_obj.find_all(['script', 'style', 'meta', '<!--', ]):
                         x.extract()
                     body = bs_obj.get_text()
                     title_str = title
                     body_str = body.strip()
+                    print body_str
                     cur.execute("UPDATE History SET title=?, body=? WHERE ID=?", (title_str, body_str, id), )
                     con.commit()
                     print str(r.status_code) + ' - ' + title + ' - Committed.'
