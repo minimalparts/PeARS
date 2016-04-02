@@ -10,7 +10,7 @@ import os
 import re
 
 
-path_to_PeARS = "/home/aurelie/PeARS-org/PeARS/demo/"
+path_to_PeARS = "/home/user/PeARS/demo/"
 num_dimensions=400
 stopwords=["","(",")","a","about","an","and","are","around","as","at","away","be","become","became","been","being","by","did","do","does","during","each","for","from","get","have","has","had","he","her","his","how","i","if","in","is","it","its","made","make","many","most","not","of","on","or","s","she","some","that","the","their","there","this","these","those","to","under","was","were","what","when","where","which","who","will","with","you","your"]
 

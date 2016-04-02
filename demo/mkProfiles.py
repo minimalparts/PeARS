@@ -5,8 +5,9 @@
 import sys
 import numpy as np
 from scipy.spatial import distance
+import os
 
-path_to_PeARS = "/home/aurelie/PeARS-org/PeARS/demo/users/"
+path_to_PeARS = os.path.join(os.path.dirname(__file__),"users/")
 stopwords=["","i","a","about","an","and","each","are","as","at","be","are","were","being","by","do","does","did","for","from","how","in","is","it","its","make","made","of","on","or","s","that","the","this","to","was","what","when","where","who","will","with","has","had","have","he","she","one","also","his","her","their","only","both","they","however","then","later","but","never","which","many"]
 num_dimensions=400
 dm_dict={}
@@ -127,7 +128,7 @@ def computePearDist(pear):
 	vbase=np.zeros(num_dimensions)
 	vecs_for_coh=[]				#Store vectors for this user in order to compute coherence
 	#Open document distributions file
-	doc_dists=open(path_to_PeARS+pear+"/"+pear+".urls.dists.txt","r")
+	doc_dists=open(path_to_PeARS+pear+"/urls.dists.txt","r")
 	for l in doc_dists:
 		l=l.rstrip('\n')
 		doc_dist=l.split()[1:]
@@ -153,7 +154,7 @@ def computePearDist(pear):
 
 
 def createProfileFile(pear,pear_dist,topics_s,coh):
-	profile=open(path_to_PeARS+pear+"/"+pear+".profile.txt",'w')
+	profile=open(path_to_PeARS+pear+"/profile.txt",'w')
 	profile.write("name = "+pear+"\n")
 	profile.write("topics = "+topics_s+"\n")
 	profile.write("coherence = "+str(coh)+"\n")
