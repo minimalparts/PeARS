@@ -1,0 +1,24 @@
+#Retrieve all WIkipedia pages for a $category
+#USAGE: ./getWikiCat [category (must have _ in place of space)]
+
+user=$1
+category=$2
+
+cd users/$user/categories
+wget https://en.wikipedia.org/wiki/Category:$category
+cat Category\:$category |egrep "^<li><a "|sed "s/^<li><a [^ ]*wiki.//"|sed "s/\".*//" > $category.list
+l=`cat $category.list|wc -l`
+
+echo "$l pages found. Continue? (y/n)"
+read input </dev/tty
+
+if [ "$input" == "y" ]
+then
+	cat $category.list|sed "s/^/https:\/\/en.wikipedia.org\/wiki\//" > $category.urls
+	curl -d "&action=submit&curonly=1&pages=$(cat $category.list | hexdump -v -e '/1 "%02x"' | sed 's/\(..\)/%\1/g' )" http://en.wikipedia.org/w/index.php?title=Special:Export -o "$category.xml"
+
+	#Extract text from wiki pages
+	python ~/handy_scripts/wikiextractor/WikiExtractor.py $category.xml -o $category.txt
+fi
+
+cd ../../../
