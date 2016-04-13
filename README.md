@@ -13,7 +13,7 @@ To know more head over to: <a href="http://aurelieherbelot.net/pears/">http://au
 
 ###Clone this repo
 
-`git clone -b development git@github.com:minimalparts/PeARS.git`
+`git clone -b development https://github.com/minimalparts/PeARS.git`
 
 `cd PeARS`
 
@@ -62,7 +62,7 @@ To know more head over to: <a href="http://aurelieherbelot.net/pears/">http://au
 
    then
 
-   `./uncompress_db wikiwoods.dump.bz2`
+   `python uncompress_db wikiwoods.dump.bz2`
 
 
 ###Running the PeARS search engine
