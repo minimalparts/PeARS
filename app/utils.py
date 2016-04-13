@@ -14,13 +14,14 @@ from .models import OpenVectors
 
 stopwords=["","(",")","a","about","an","and","are","around","as","at","away","be","become","became","been","being","by","did","do","does","during","each","for","from","get","have","has","had","her","his","how","i","if","in","is","it","its","made","make","many","most","of","on","or","s","some","that","the","their","there","this","these","those","to","under","was","were","what","when","where","who","will","with","you","your"]
 
+root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 ########################################################
 # Normalise array
 ########################################################
 
 def normalise(v):
     norm=linalg.norm(v)
-    if norm==0: 
+    if norm==0:
        return v
     return v/norm
 
@@ -42,19 +43,20 @@ def cosine_similarity(peer_v, query_v):
 #################################################
 
 def loadEntropies():
-	entropies_dict={}
-	entropies_file = os.path.join(
-	    os.path.dirname(__file__),
-	    "ukwac.entropy.txt")
-	f=open(entropies_file,"r")
-	for l in f:
+    global root_dir
+    entropies_dict={}
+    entropies_file = os.path.join(
+            root_dir, "demo",
+            "ukwac.entropy.txt")
+    f=open(entropies_file,"r")
+    for l in f:
 		l=l.rstrip('\n')
 		fields=l.split('\t')
 		w=fields[0].lower()
 		if w.isalpha() and w not in entropies_dict:			#Must have this cos lower() can match two instances of the same word in the list
 			entropies_dict[w]=float(fields[1])
-	f.close()
-	return entropies_dict
+    f.close()
+    return entropies_dict
 
 ##############################################
 # Make distribution for query
