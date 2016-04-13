@@ -4,35 +4,16 @@
 # USAGE: called by mkQueryPage.py when user enters a query
 ################################################################
 
-from numpy import *
+import numpy as np
+from math import isnan
 import urllib
-import sys
 import re
-import os
-from .utils import mkQueryDist, cosine_similarity, print_timing
+from .utils import cosine_similarity, print_timing
 
 
-shared_pears_ids = os.path.join(
-    os.path.dirname(__file__),
-    "shared_pears_ids.txt")
-dm_dict = {}  # Dictionary to store dm file
+num_best_pears=5
 
 
-#################################################
-# Read dm file
-#################################################
-
-#def readDM():
-#    with open(os.path.join(os.path.dirname(__file__), "wikiwoods.dm")) as f:
-#        dmlines = f.readlines()
-#        f.close()
-#
-#    # Make dictionary with key=row, value=vector
-#    for l in dmlines:
-#        items = l.rstrip('\n').split('\t')
-#        row = items[0]
-#        vec = [float(i) for i in items[1:]]
-#        dm_dict[row] = vec
 
 ###################################################
 # Sort scores and output n best pears
@@ -40,10 +21,9 @@ dm_dict = {}  # Dictionary to store dm file
 
 def outputBestPears(pears_scores):
     pears = []
-    num_best = 3  # Top best pears to search
     count = 0
     for w in sorted(pears_scores, key=pears_scores.get, reverse=True):
-        if count < num_best:
+        if count < num_best_pears:
             print w, pears_scores[w]
             pears.append(w)
             count += 1
@@ -61,8 +41,10 @@ def outputBestPears(pears_scores):
         pi_name = ""
         pi_picture = ""
         pi_message = ""
-        base_url = pear + '/'
-        profile_file = urllib.urlopen(base_url + "profile.txt")
+	if pear.endswith('/'):
+	        pear = pear[:-1]
+        #profile_file = urllib.urlopen(base_url + "profile.txt")
+        profile_file = open(pear+"/profile.txt")
 
         profile.append(pear)
         for line in profile_file:
@@ -75,8 +57,6 @@ def outputBestPears(pears_scores):
         profile.append("./static/pi-pic.png")
 
         r.append(profile)
-#		print profile
-
     return r
 
 
@@ -86,31 +66,21 @@ def outputBestPears(pears_scores):
 
 # The @ decorator before the function invokes print_timing()
 @print_timing
-def runScript(query):
+def runScript(query_dist,pears_ids):
     best_pears = []
-    query_v = mkQueryDist(query)
 
     #############################################################
     # Calculate score for each pear in relation to the user query
     #############################################################
 
-    if len(query_v) > 0:
-        sp = open(shared_pears_ids, 'r')
-        pears = sp.readlines()
-        sp.close()
-
+    if len(query_dist) > 0:
         pears_scores = {}
-        for l in pears:
-            l = l.rstrip('\n')
-            pear_name = l.split('|')[0]
-            pear_v = array(l.split('|')[1].split())
-            pear_v = [double(i) for i in pear_v]
-            score = cosine_similarity(pear_v, query_v)
-            pears_scores[pear_name] = score
-
-        best_pears = outputBestPears(pears_scores)
+	for pear_name,v in pears_ids.items():
+		scoreSIM = 0.0          #Initialise score for similarity
+		score=cosine_similarity(np.array(v),query_dist)
+		if not isnan(score):
+			pears_scores[pear_name]=score
+			print pear_name,score
+        best_pears=outputBestPears(pears_scores)
     return best_pears
 
-if __name__ == '__main__':
-    # when executing as script
-    runScript(sys.argv[1])

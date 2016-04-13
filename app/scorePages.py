@@ -3,49 +3,60 @@
 # Called by ./mkQueryPage.py
 #######################################################################
 
-from operator import itemgetter, attrgetter
 from numpy import *
-import subprocess
-import collections
 import webbrowser
 import urllib
 import sys
 import re
 import os
+from operator import itemgetter
 from .utils import mkQueryDist, cosine_similarity, print_timing
-
 import getUrlOverlap
 
-# Change this line to your PeARS folder path
-dm_dict = {}  # Dictionary to store dm file
-url_dict = {}  # Dictionary file ids - urls
-reverse_url_dict = {}  # Dictionary urls - file ids
-doc_scores = {}  # Document scores
-url_wordclouds = {}  # Stores correspondence between url and word cloud for this query
-# url_snippets={}         #Stores correspondence between url and best
-# snippet for this query
+
+###############################################
+# Get distributional score
+###############################################
+
+def scoreDS(query_dist,url_dict):
+    DS_scores={}
+    for url,doc_dist in url_dict.items():
+    	score = cosine_similarity(doc_dist, query_dist)
+    	DS_scores[url] = score
+	#print url,score
+    return DS_scores
+
+
+###############################################
+# Get url overlap score
+###############################################
+
+def scoreURL(query,url_dict):
+    URL_scores={}
+    for u in url_dict:
+        URL_scores[u]=getUrlOverlap.runScript(query,u)
+        #print v,"URL score",URL_scores[v]
+    return URL_scores
 
 ##############################################
-# Read url file
-##############################################
+# Get URL-vector dict
+#############################################
 
-
-def loadURLs(pear):
-    print "Loading URL dictionary for", pear
+def getUrlDict(pear):
+    url_dict={}
     if pear.endswith('/'):
         pear = pear[:-1]
-    path_to_dict = pear + "/urls.dict.txt"
-
-    d = urllib.urlopen(path_to_dict)
-    #d = open(path_to_dict)
-    for line in d:
-        line = line.rstrip('\n')
-        idfile = line.split()[0]
-        url = line.split()[1]
-        # print idfile,url
-        url_dict[idfile] = url  # Record the pairs url - file name on pear
-        reverse_url_dict[url] = idfile
-    d.close()
+    doc_dists = open(pear+"/urls.dists.txt")
+    #doc_dists = urllib.urlopen(pear+"urls.dists.txt")
+    for l in doc_dists:
+        l = l.rstrip('\n')
+	fields=l.split()
+        url = fields[0]
+	doc_dist =[float(i) for i in fields[1:]]
+	url_dict[url]=doc_dist
+    doc_dists.close()
+    #print pear,"(",len(url_dict),"pages)",
+    return url_dict
 
 
 ##############################################
@@ -55,75 +66,40 @@ def loadURLs(pear):
 
 def loadWordClouds(pear):
     print "Loading word clouds..."
-    word_clouds = urllib.urlopen(pear + "/wordclouds.txt")
-    #word_clouds = open(pear + "/wordclouds.txt")
+    url_wordclouds={}
+    #word_clouds = urllib.urlopen(pear + "/wordclouds.txt")
+    word_clouds = open(pear + "/wordclouds.txt")
     for l in word_clouds:
         l = l.rstrip('\n')
-        fields = l.split(':')
-        url_wordclouds[url_dict[fields[0]]] = fields[1]
+        fields = l.split()
+	url=fields[0]
+	cloud=""
+	for f in fields[1:]:
+		cloud+=f+" "
+	cloud=cloud[:-1]
+        url_wordclouds[url] = cloud
 
     word_clouds.close()
+    return url_wordclouds
 
-
-###############################################
-# Get distributional score
-###############################################
-
-@print_timing
-def scoreDS(query_dist, pear):
-    dd = urllib.urlopen(pear + "/doc.dists.txt")
-    #dd = open(pear + "/doc.dists.txt")
-    doc_dists = dd.readlines()
-    dd.close()
-    # print "Done reading dd"
-
-    DS_scores = {}
-    for l in doc_dists:
-        l = l.rstrip('\n')
-        doc_id = l.split(':')[0]
-        doc_dist = array(l.split(':')[1].split())
-        doc_dist = [double(i) for i in doc_dist]
-	#print url_dict[doc_id],cosine_similarity(doc_dist,query_dist)
-        score = cosine_similarity(doc_dist, query_dist)
-        DS_scores[url_dict[doc_id]] = score
-        # url_wordclouds[url_dict[doc_id]]=getWordCloud(pear,doc_id)
-    return DS_scores
-
-
-###############################################
-# Get url overlap score
-###############################################
-
-@print_timing
-def scoreURL(query):
-    q = re.sub("_.", '', query)
-    URL_scores = {}
-    for k, v in url_dict.items():
-        URL_scores[v] = getUrlOverlap.runScript(q, v)
-        # print query,v,URL_scores[v]
-    return URL_scores
 
 ################################################
 # Score documents for a pear
 ################################################
 
-
-@print_timing
-def scoreDocs(query, query_dist, pear):
-    DS_scores = scoreDS(query_dist, pear)
-    URL_scores = scoreURL(query)
-    for k, v in url_dict.items():
+def scoreDocs(query, query_dist, url_dict):
+    document_scores = {}  # Document scores
+    DS_scores=scoreDS(query_dist,url_dict)
+    URL_scores=scoreURL(query,url_dict)
+    for v in url_dict:
         if v in DS_scores and v in URL_scores:
-#	    if DS_scores[v] > 0.4:
-#		print v, DS_scores[v]
-            if URL_scores[v] > 0.7 and DS_scores[v] > 0.4:  # If URL overlap high and similarity okay
-                print v, DS_scores[v], URL_scores[v]
-                # Boost DS score by a maximum of 0.2 (thresholds to be updated
-                # when we have proper evaluation data)
-                doc_scores[v] = DS_scores[v] + URL_scores[v] * 0.2
-            else:
-                doc_scores[v] = DS_scores[v]
-    return doc_scores
+                if URL_scores[v] > 0.7 and DS_scores[v] > 0.2:                                      #If URL overlap high (0.2 because of averag e length of query=4 -- see getUrlOverlap --  and similarity okay
+                        document_scores[v]=DS_scores[v]+URL_scores[v]*0.2                                #Boost DS score by a maximum of 0.2
+                else:
+                	document_scores[v]=DS_scores[v]
+	if math.isnan(document_scores[v]):								    #Check for potential NaN -- messes up with sorting in bestURLs.
+		document_scores[v]=0
+    return document_scores	
 
 #################################################
 # Get best URLs
@@ -134,10 +110,9 @@ def bestURLs(doc_scores):
     best_urls = []
     c = 0
     for w in sorted(doc_scores, key=doc_scores.get, reverse=True):
-        if c < 10:
-            if doc_scores[w] > 0.4:  # Threshold - page must be good enough
-                best_urls.append(w)
-		print w, doc_scores[w]
+        if c < 50:
+            best_urls.append(w)
+	    print w, doc_scores[w]
             c += 1
         else:
             break
@@ -149,7 +124,7 @@ def bestURLs(doc_scores):
 ################################################
 
 
-def output(best_urls, query):
+def output(best_urls, query, url_wordclouds):
     results = []
 #	print query
     # If documents matching the query were found on the pear network...
@@ -177,24 +152,24 @@ def output(best_urls, query):
     return results
 
 ##############################################
-# Main function, called by mkQueryPage.py
+# Main function
 ##############################################
 
-# The @ decorator before the function invokes print_timing()
-
-
-@print_timing
-def runScript(pears, query):
-    query_dist = mkQueryDist(query)
-    best_urls = []
-    if len(pears) > 0:
+def runScript(query,query_dist,pears):
+	all_pears_doc_scores = {}  # Document scores
+	all_url_wordclouds = {}
         for pear in pears:
-            # print pear
-            loadURLs(pear)
-            loadWordClouds(pear)
-            scoreDocs(query, query_dist, pear)
-        best_urls = bestURLs(doc_scores)
-    return output(best_urls, query)
+        	wc=loadWordClouds(pear)
+		for k,v in wc.items():
+			all_url_wordclouds[k]=v
+		url_dict=getUrlDict(pear)
+		#document_scores=scoreDocs(query, query_dist, url_dict):	#with URL overlap
+		document_scores=scoreDS(query_dist, url_dict)			#without URL overlap
+		for k,v in document_scores.items():
+			if v > 0.3:						#Doc must be good enough
+				all_pears_doc_scores[k]=v
+	best_urls=bestURLs(all_pears_doc_scores)
+        return output(best_urls, query, all_url_wordclouds)
 
 if __name__ == '__main__':
-    runScript(sys.argv[1], sys.argv[2])
+    runScript(sys.argv[1], sys.argv[2],sys.argv[3])
